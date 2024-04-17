@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "483267270304",
+    "project_id": "ogirireal",
+    "storage_bucket": "ogirireal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483267270304:android:90b3660740a1598c71dbc5",
+        "android_client_info": {
+          "package_name": "com.example.ogirealApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL6lkfKtJM0R4mGhaIxOnckJue6qlXENU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483267270304:android:660dabd65544cb0971dbc5",
+        "android_client_info": {
+          "package_name": "com.example.ogireal_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL6lkfKtJM0R4mGhaIxOnckJue6qlXENU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
