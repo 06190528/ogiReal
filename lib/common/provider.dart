@@ -1,16 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ogireal_app/common/data/dataCustomClass.dart';
+import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 
+const defaultUserData = UserData(
+  id: null,
+  name: null,
+  icon: null,
+  posts: [],
+  follows: [],
+  followers: [],
+  goodCardIds: [],
+);
 final userDataProvider = StateProvider<UserData>((ref) {
-  return UserData(
-    id: null,
-    name: null,
-    icon: null,
-    posts: [],
-    follows: [],
-    followers: [],
-  );
+  return defaultUserData;
 });
 
 final nowThemeProvider = StateProvider<String>((ref) {

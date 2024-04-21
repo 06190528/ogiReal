@@ -22,6 +22,7 @@ mixin _$UserData {
   List<Post> get posts => throw _privateConstructorUsedError;
   List<Follow> get follows => throw _privateConstructorUsedError;
   List<AbstractUserData> get followers => throw _privateConstructorUsedError;
+  List<String> get goodCardIds => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UserDataCopyWith<UserData> get copyWith =>
@@ -39,7 +40,8 @@ abstract class $UserDataCopyWith<$Res> {
       Image? icon,
       List<Post> posts,
       List<Follow> follows,
-      List<AbstractUserData> followers});
+      List<AbstractUserData> followers,
+      List<String> goodCardIds});
 }
 
 /// @nodoc
@@ -61,6 +63,7 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
     Object? posts = null,
     Object? follows = null,
     Object? followers = null,
+    Object? goodCardIds = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -87,6 +90,10 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.followers
           : followers // ignore: cast_nullable_to_non_nullable
               as List<AbstractUserData>,
+      goodCardIds: null == goodCardIds
+          ? _value.goodCardIds
+          : goodCardIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -105,7 +112,8 @@ abstract class _$$UserDataImplCopyWith<$Res>
       Image? icon,
       List<Post> posts,
       List<Follow> follows,
-      List<AbstractUserData> followers});
+      List<AbstractUserData> followers,
+      List<String> goodCardIds});
 }
 
 /// @nodoc
@@ -125,6 +133,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
     Object? posts = null,
     Object? follows = null,
     Object? followers = null,
+    Object? goodCardIds = null,
   }) {
     return _then(_$UserDataImpl(
       id: freezed == id
@@ -151,6 +160,10 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value._followers
           : followers // ignore: cast_nullable_to_non_nullable
               as List<AbstractUserData>,
+      goodCardIds: null == goodCardIds
+          ? _value._goodCardIds
+          : goodCardIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -164,10 +177,12 @@ class _$UserDataImpl implements _UserData {
       required this.icon,
       required final List<Post> posts,
       required final List<Follow> follows,
-      required final List<AbstractUserData> followers})
+      required final List<AbstractUserData> followers,
+      required final List<String> goodCardIds})
       : _posts = posts,
         _follows = follows,
-        _followers = followers;
+        _followers = followers,
+        _goodCardIds = goodCardIds;
 
   @override
   final String? id;
@@ -199,9 +214,17 @@ class _$UserDataImpl implements _UserData {
     return EqualUnmodifiableListView(_followers);
   }
 
+  final List<String> _goodCardIds;
+  @override
+  List<String> get goodCardIds {
+    if (_goodCardIds is EqualUnmodifiableListView) return _goodCardIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_goodCardIds);
+  }
+
   @override
   String toString() {
-    return 'UserData(id: $id, name: $name, icon: $icon, posts: $posts, follows: $follows, followers: $followers)';
+    return 'UserData(id: $id, name: $name, icon: $icon, posts: $posts, follows: $follows, followers: $followers, goodCardIds: $goodCardIds)';
   }
 
   @override
@@ -215,7 +238,9 @@ class _$UserDataImpl implements _UserData {
             const DeepCollectionEquality().equals(other._posts, _posts) &&
             const DeepCollectionEquality().equals(other._follows, _follows) &&
             const DeepCollectionEquality()
-                .equals(other._followers, _followers));
+                .equals(other._followers, _followers) &&
+            const DeepCollectionEquality()
+                .equals(other._goodCardIds, _goodCardIds));
   }
 
   @override
@@ -226,7 +251,8 @@ class _$UserDataImpl implements _UserData {
       icon,
       const DeepCollectionEquality().hash(_posts),
       const DeepCollectionEquality().hash(_follows),
-      const DeepCollectionEquality().hash(_followers));
+      const DeepCollectionEquality().hash(_followers),
+      const DeepCollectionEquality().hash(_goodCardIds));
 
   @JsonKey(ignore: true)
   @override
@@ -242,7 +268,8 @@ abstract class _UserData implements UserData {
       required final Image? icon,
       required final List<Post> posts,
       required final List<Follow> follows,
-      required final List<AbstractUserData> followers}) = _$UserDataImpl;
+      required final List<AbstractUserData> followers,
+      required final List<String> goodCardIds}) = _$UserDataImpl;
 
   @override
   String? get id;
@@ -256,6 +283,8 @@ abstract class _UserData implements UserData {
   List<Follow> get follows;
   @override
   List<AbstractUserData> get followers;
+  @override
+  List<String> get goodCardIds;
   @override
   @JsonKey(ignore: true)
   _$$UserDataImplCopyWith<_$UserDataImpl> get copyWith =>

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,6 +70,10 @@ class UserDataService {
           ref.read(userDataProvider.notifier).state =
               userData.copyWith(followers: value);
           break;
+        case 'goodCardIds':
+          ref.read(userDataProvider.notifier).state =
+              userData.copyWith(goodCardIds: value);
+          break;
       }
       final Map<String, dynamic> data =
           convertUserDataToMap(ref.read(userDataProvider));
@@ -78,4 +83,59 @@ class UserDataService {
           .set(data); // 既存のデータにマージ
     }
   }
+}
+
+//dateDataこコレクションのusersPostsフィールドの中のcardIdを探して自分goodの変更を保存しにいく
+Future<void> changeTargetUserCardGood(
+    WidgetRef ref, Post targetUserPost, bool isLiked) async {
+  String date = targetUserPost.date;
+  DocumentReference dateDocRef =
+      FirebaseFirestore.instance.collection('dateData').doc(date);
+
+  await FirebaseFirestore.instance.runTransaction((transaction) async {
+    DocumentSnapshot dateDocSnapshot = await transaction.get(dateDocRef);
+
+    if (dateDocSnapshot.exists && dateDocSnapshot.data() != null) {
+      List<dynamic> usersPosts = dateDocSnapshot['usersPosts'];
+      // 特定のcardIdを持つPostを見つける
+      int postIndex = usersPosts
+          .indexWhere((post) => post['cardId'] == targetUserPost.cardId);
+
+      if (postIndex != -1) {
+        Map<String, dynamic> postToUpdate = usersPosts[postIndex];
+        int changeGood = isLiked ? -1 : 1;
+        postToUpdate['good'] = (postToUpdate['good'] as int) + changeGood;
+        usersPosts[postIndex] = postToUpdate;
+        transaction.update(dateDocRef, {'usersPosts': usersPosts});
+      }
+    }
+  });
+}
+
+//usersコレクションのtargetUserIdドキュメントのpostsフィールドの中のcardIdを探して自分goodの変更を保存しにいく
+Future<void> changeTargetUserPostGood(
+    WidgetRef ref, Post targetUserPost, bool isLiked) async {
+  String targetUserId = targetUserPost.userId;
+  DocumentReference targetUserDocRef =
+      FirebaseFirestore.instance.collection('users').doc(targetUserId);
+
+  await FirebaseFirestore.instance.runTransaction((transaction) async {
+    DocumentSnapshot targetUserDocSnapshot =
+        await transaction.get(targetUserDocRef);
+
+    if (targetUserDocSnapshot.exists && targetUserDocSnapshot.data() != null) {
+      List<dynamic> posts = targetUserDocSnapshot['posts'];
+      // 特定のcardIdを持つPostを見つける
+      int postIndex =
+          posts.indexWhere((post) => post['cardId'] == targetUserPost.cardId);
+
+      if (postIndex != -1) {
+        Map<String, dynamic> postToUpdate = posts[postIndex];
+        int changeGood = isLiked ? -1 : 1;
+        postToUpdate['good'] = (postToUpdate['good'] as int) + changeGood;
+        posts[postIndex] = postToUpdate;
+        transaction.update(targetUserDocRef, {'posts': posts});
+      }
+    }
+  });
 }

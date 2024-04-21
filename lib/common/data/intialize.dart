@@ -7,19 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_api_availability/google_api_availability.dart';
-import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
+import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/settingWidget.dart';
 
 Future<void> initialize(WidgetRef ref, BuildContext context) async {
   try {
-    DateTime now = DateTime.now();
-    String todayDate = DateFormat('yyyyMMdd').format(now);
     final String userId = await UserDataService().getUserId();
-    print('User ID: $userId');
+    if (ref.read(userDataProvider) != defaultUserData) {
+      return;
+    }
     UserData? userData =
         await UserDataService().fetchUserDataFromFireBase(userId);
     if (userData != null) {
@@ -42,7 +42,7 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
       }
     }
     initializeMessaging();
-    getTodayUsersPostsAndTheme(ref, todayDate);
+    await getTodayUsersPostsAndTheme(ref, globalDate);
   } catch (e) {
     print('Error fetching user data: $e');
   }
@@ -82,7 +82,6 @@ Future<void> initializeMessaging() async {
   // Subscribe to topic
   try {
     await messaging.subscribeToTopic("allUsers");
-    print("Subscribed to topic: allUsers");
   } catch (e) {
     print("Error subscribing to topic: $e");
   }
@@ -92,24 +91,35 @@ Future<void> initializeMessaging() async {
 }
 
 Future<void> getTodayUsersPostsAndTheme(WidgetRef ref, String date) async {
-  //firebaseからテーマとusersPostsとる
-  DocumentSnapshot themeDoc =
-      await FirebaseFirestore.instance.collection('themes').doc(date).get();
-  DocumentSnapshot usersPostsDoc =
-      await FirebaseFirestore.instance.collection('usersPosts').doc(date).get();
+  try {
+    print('Fetching today\'s users posts and theme');
+    DocumentSnapshot dateDocRef = await FirebaseFirestore.instance
+        .collection('dateData')
+        .doc(globalDate)
+        .get();
 
-  if (themeDoc.exists) {
-    String theme = themeDoc['theme'];
-    ref.read(nowThemeProvider.notifier).state = theme;
+    if (dateDocRef.exists && dateDocRef.data() != null) {
+      Map<String, dynamic> data = dateDocRef.data() as Map<String, dynamic>;
 
-    if (usersPostsDoc.exists && usersPostsDoc.data() != null) {
-      print('Users posts data: ${usersPostsDoc.data()}');
-      Map<String, dynamic> postsData =
-          usersPostsDoc.data() as Map<String, dynamic>;
-      List<Post> usersPosts = postsData.entries.map((entry) {
-        return Post.fromSnapshot(entry.value as DocumentSnapshot);
-      }).toList();
-      ref.read(usersPostsProvider.notifier).state = usersPosts;
+      // テーマの取得と設定
+      String theme =
+          data['theme'] as String? ?? 'デフォルトテーマ'; // nullの場合はデフォルトテーマを使用
+      ref.read(nowThemeProvider.notifier).state = theme;
+
+      // 投稿リストの取得と設定
+      if (data.containsKey('usersPosts')) {
+        List<dynamic> postsList = data['usersPosts'] as List<dynamic>;
+        List<Post> usersPosts = postsList.map((postData) {
+          return Post.fromJson(postData as Map<String, dynamic>);
+        }).toList();
+        ref.read(usersPostsProvider.notifier).state = usersPosts;
+      } else {
+        ref.read(usersPostsProvider.notifier).state = [];
+      }
+    } else {
+      print('Date data or theme data is not available.');
     }
+  } catch (e) {
+    print('Error fetching user data: $e');
   }
 }
