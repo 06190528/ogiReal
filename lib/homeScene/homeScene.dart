@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/intialize.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
@@ -17,7 +18,9 @@ class HomeScene extends ConsumerWidget {
     final usersPosts = ref.watch(usersPostsProvider);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setAllUsersPosts(ref);
+    });
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
@@ -39,8 +42,7 @@ class HomeScene extends ConsumerWidget {
                       child: OgiriCard(
                         cardWidth: width * 0.8,
                         cardHeight: height * 0.2,
-                        answer: usersPosts[index].answer,
-                        post: usersPosts[index],
+                        index: index,
                       ),
                     );
                   },

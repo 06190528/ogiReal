@@ -41,8 +41,7 @@ class PostScene extends ConsumerWidget {
             OgiriCard(
               cardHeight: height * 0.2,
               cardWidth: width * 0.8,
-              answer: null,
-              post: null,
+              index: null,
             ),
             Spacer(), // OgiriCard とボタンの間にスペースを追加
             RectangleButtonWidget(

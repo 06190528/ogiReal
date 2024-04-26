@@ -29,7 +29,7 @@ const defaultPost = Post(
 );
 
 class CountdownTimerNotifier extends StateNotifier<int> {
-  CountdownTimerNotifier() : super(300); // 300 seconds for 5 minutes
+  CountdownTimerNotifier() : super(300);
 
   Timer? _timer;
 
@@ -95,6 +95,5 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
         .set(updatedPost.toJson());
   } catch (e) {
     print('投稿エラー: $e');
-    // ここでエラーメッセージをユーザーに表示するロジックを追加することが推奨されます
   }
 }

@@ -9,33 +9,33 @@ import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
 final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
         (ref) => TextEditingController());
-final targetCardProvider =
-    StateProvider.family<Post, String>((ref, id) => defaultPost);
+
+final targetPostProvider = StateProvider.family<Post, int>((ref, index) {
+  return defaultPost;
+});
 
 class OgiriCard extends ConsumerWidget {
   final double? cardWidth;
   final double? cardHeight;
-  final String? answer;
-  final Post? post;
+  final int? index;
 
   OgiriCard({
     super.key,
     required this.cardWidth,
     required this.cardHeight,
-    required this.answer,
-    required this.post,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userId = ref.read(userDataProvider).id;
-    final targetCard = ref.watch(targetCardProvider(post?.cardId ?? ''));
+    final post = ref.watch(targetPostProvider(index ?? 0));
+    final answer = post.answer;
     final userData = ref.read(userDataProvider);
-    final isLiked = userData.goodCardIds.contains(post?.cardId ?? '');
+    final isLiked = userData.goodCardIds.contains(post.cardId ?? '');
     final textState = ref.read(postProvider);
     final theme = ref.watch(nowThemeProvider);
     final textController = ref.watch(textControllerStateProvider);
-    final bool posting = answer == null;
+    final bool posting = index == null;
     final width = cardWidth ?? 0;
     final height = cardHeight ?? 0;
     final String userName = ref.read(userDataProvider).name ?? '';
@@ -98,7 +98,7 @@ class OgiriCard extends ConsumerWidget {
                     onPressed: () {
                       if (posting) return;
                       if (post == null) return;
-                      pushCardGoodButton(ref, post!, isLiked);
+                      pushCardGoodButton(ref, post!, isLiked, index ?? 0);
                     },
                   ),
                 ],
