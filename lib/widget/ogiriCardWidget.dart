@@ -1,9 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
 
 final textControllerStateProvider =
@@ -18,27 +19,30 @@ class OgiriCard extends ConsumerWidget {
   final double? cardWidth;
   final double? cardHeight;
   final int? index;
+  final Function(Post post, bool isLiked, int index)?
+      pushCardGoodButtonCallback;
 
   OgiriCard({
     super.key,
     required this.cardWidth,
     required this.cardHeight,
     required this.index,
+    required this.pushCardGoodButtonCallback,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final post = ref.watch(targetPostProvider(index ?? 0));
-    final answer = post.answer;
+    final bool posting = index == null;
+    final post =
+        posting ? defaultPost : ref.watch(targetPostProvider(index ?? 0));
+    final answer = posting ? '' : post.answer;
     final userData = ref.read(userDataProvider);
-    final isLiked = userData.goodCardIds.contains(post.cardId ?? '');
+    final isLiked = userData.goodCardIds.contains(post.cardId);
     final textState = ref.read(postProvider);
     final theme = ref.watch(nowThemeProvider);
     final textController = ref.watch(textControllerStateProvider);
-    final bool posting = index == null;
     final width = cardWidth ?? 0;
     final height = cardHeight ?? 0;
-    final String userName = ref.read(userDataProvider).name ?? '';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       textController.text = answer ?? "";
@@ -96,9 +100,8 @@ class OgiriCard extends ConsumerWidget {
                       size: height * 0.12,
                     ),
                     onPressed: () {
-                      if (posting) return;
-                      if (post == null) return;
-                      pushCardGoodButton(ref, post!, isLiked, index ?? 0);
+                      pushCardGoodButtonCallback?.call(
+                          post, isLiked, index ?? 0);
                     },
                   ),
                 ],
@@ -140,7 +143,7 @@ class OgiriCard extends ConsumerWidget {
                         ),
                       )
                     : Text(
-                        answer ?? "no answer", // デフォルトテキストを表示
+                        answer,
                         textAlign: TextAlign.center, // Text ウィジェットのテキストも中央揃えに
                         style: TextStyle(
                           fontSize: height * 0.07,
@@ -156,7 +159,7 @@ class OgiriCard extends ConsumerWidget {
                 Icon(Icons.favorite, size: height * 0.1, color: Colors.red),
                 SizedBox(width: width * 0.01),
                 Text(
-                  '×${post?.goodCount ?? 0}',
+                  '× ${post.goodCount}',
                   style: TextStyle(
                     fontSize: height * 0.07,
                     color: Colors.black,
@@ -168,7 +171,7 @@ class OgiriCard extends ConsumerWidget {
                     print("tapped");
                   },
                   child: Text(
-                    post?.userName ?? userName, // ユーザー名表示、null の場合は "Anonymous"
+                    post.userName,
                     style: TextStyle(
                       fontSize: height * 0.07,
                       color: Colors.blue, // ユーザー名の色を青に設定

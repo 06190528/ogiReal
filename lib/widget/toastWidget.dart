@@ -6,7 +6,7 @@ class ToastWidget {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        bottom: height * 0.15,
+        bottom: height * 0.2,
         left: width * 0.2,
         right: width * 0.2,
         child: Material(

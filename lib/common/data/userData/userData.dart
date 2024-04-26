@@ -22,10 +22,10 @@ UserData convertMapToUserData(String userId, Map<String, dynamic> data) {
     id: data['id'],
     name: data['name'],
     icon: data['icon'],
-    userPostsCardIds: List<String>.from(data['userPostsCardIds'] ?? []),
-    follows: [], // データに応じて適切に変換
-    followers: [], // データに応じて適切に変換
-    goodCardIds: [],
+    userPostsCardIds: List<String>.from(data['userPostsCardIds']),
+    follows: List<Follow>.from(data['follows'] ?? []),
+    followers: List<AbstractUserData>.from(data['followers'] ?? []),
+    goodCardIds: List<String>.from(data['goodCardsIds'] ?? []),
   );
 }
 

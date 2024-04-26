@@ -6,6 +6,7 @@ import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
+import 'package:ogireal_app/widget/toastWidget.dart';
 
 class HomeScene extends ConsumerWidget {
   static const String routeName = '/home';
@@ -15,6 +16,7 @@ class HomeScene extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     initialize(ref, context);
+    final userData = ref.watch(userDataProvider);
     final usersPosts = ref.watch(usersPostsProvider);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
@@ -43,6 +45,14 @@ class HomeScene extends ConsumerWidget {
                         cardWidth: width * 0.8,
                         cardHeight: height * 0.2,
                         index: index,
+                        pushCardGoodButtonCallback: (post, isLiked, index) {
+                          if (post == null || post.userId == userData.id) {
+                            ToastWidget.showToast(
+                                '自分の投稿にはいいねできません', width, height, context);
+                            return;
+                          }
+                          pushCardGoodButton(ref, post!, isLiked, index ?? 0);
+                        },
                       ),
                     );
                   },
