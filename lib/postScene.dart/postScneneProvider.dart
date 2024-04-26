@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
+import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
@@ -23,7 +24,7 @@ const defaultPost = Post(
   date: '',
   answer: '',
   theme: '',
-  good: 0,
+  goodCount: 0,
   cardId: '',
 );
 
@@ -54,53 +55,46 @@ class CountdownTimerNotifier extends StateNotifier<int> {
   }
 }
 
-Future<void> savePostCardToFirebase(WidgetRef ref) async {
+Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
   final Post post = ref.read(postProvider);
   final UserData userData = ref.read(userDataProvider);
   final String? userId = userData.id;
   final String? userName = userData.name;
 
   if (userId == null || userName == null) {
-    print('投稿できませんでした');
+    print('必要なユーザー情報がありません');
     return;
   }
 
-  // 現在の日時からカード ID を生成
-  final String cardId =
-      DateFormat('yyyyMMddHHmmss').format(DateTime.now()) + userId;
+  final String cardId = globalDate +
+      '_' +
+      DateFormat('HHmmss').format(DateTime.now()) +
+      "_" + // スラッシュをアンダースコアに置き換えました
+      userId;
 
-  final updatedPost = post.copyWith(
+  Post updatedPost = post.copyWith(
     userName: userName,
     userId: userId,
     date: globalDate,
     theme: ref.read(nowThemeProvider),
-    good: 0,
-    cardId: cardId, // カード ID を設定
+    goodCount: 0,
+    cardId: cardId,
   );
 
   ref.read(postProvider.state).state = updatedPost;
 
-  // 'dateData' コレクション内の 'globalDate' ドキュメントを取得
-  DocumentSnapshot dateDocRef = await FirebaseFirestore.instance
-      .collection('dateData')
-      .doc(globalDate)
-      .get();
+  List<String> userPostsCardIds = List<String>.from(userData.userPostsCardIds);
+  userPostsCardIds.add(cardId);
+  await UserDataService()
+      .saveUserDataToFirebase(ref, 'userPostsCardIds', userPostsCardIds);
 
-  if (!dateDocRef.exists) {
-    print('指定された日付のデータが存在しません。');
-    return;
+  try {
+    await FirebaseFirestore.instance
+        .collection('usersPosts')
+        .doc(cardId)
+        .set(updatedPost.toJson());
+  } catch (e) {
+    print('投稿エラー: $e');
+    // ここでエラーメッセージをユーザーに表示するロジックを追加することが推奨されます
   }
-
-  // usersPostsリストを更新
-  await FirebaseFirestore.instance
-      .collection('dateData')
-      .doc(globalDate)
-      .update({
-    'usersPosts': FieldValue.arrayUnion([updatedPost.toJson()])
-  });
-
-  // users コレクションにも投稿データを更新
-  await FirebaseFirestore.instance.collection('users').doc(userId).update({
-    'posts': FieldValue.arrayUnion([updatedPost.toJson()])
-  });
 }

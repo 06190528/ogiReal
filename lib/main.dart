@@ -6,7 +6,6 @@ import 'package:ogireal_app/firebase_options.dart';
 import 'package:ogireal_app/homeScene/homeScene.dart';
 import 'package:ogireal_app/postScene.dart/postScene.dart';
 import 'package:ogireal_app/userInfoScene/userInfoScene.dart';
-import 'package:flutter/rendering.dart'; // 追加
 
 void main() async {
   // debugPaintSizeEnabled = true; // UIのデバッグを有効にする

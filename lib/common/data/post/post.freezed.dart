@@ -25,7 +25,7 @@ mixin _$Post {
   String get date => throw _privateConstructorUsedError;
   String get answer => throw _privateConstructorUsedError;
   String get theme => throw _privateConstructorUsedError;
-  int get good => throw _privateConstructorUsedError;
+  int get goodCount => throw _privateConstructorUsedError;
   String get cardId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,7 +44,7 @@ abstract class $PostCopyWith<$Res> {
       String date,
       String answer,
       String theme,
-      int good,
+      int goodCount,
       String cardId});
 }
 
@@ -66,7 +66,7 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? date = null,
     Object? answer = null,
     Object? theme = null,
-    Object? good = null,
+    Object? goodCount = null,
     Object? cardId = null,
   }) {
     return _then(_value.copyWith(
@@ -90,9 +90,9 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as String,
-      good: null == good
-          ? _value.good
-          : good // ignore: cast_nullable_to_non_nullable
+      goodCount: null == goodCount
+          ? _value.goodCount
+          : goodCount // ignore: cast_nullable_to_non_nullable
               as int,
       cardId: null == cardId
           ? _value.cardId
@@ -115,7 +115,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       String date,
       String answer,
       String theme,
-      int good,
+      int goodCount,
       String cardId});
 }
 
@@ -134,7 +134,7 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? date = null,
     Object? answer = null,
     Object? theme = null,
-    Object? good = null,
+    Object? goodCount = null,
     Object? cardId = null,
   }) {
     return _then(_$PostImpl(
@@ -158,9 +158,9 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as String,
-      good: null == good
-          ? _value.good
-          : good // ignore: cast_nullable_to_non_nullable
+      goodCount: null == goodCount
+          ? _value.goodCount
+          : goodCount // ignore: cast_nullable_to_non_nullable
               as int,
       cardId: null == cardId
           ? _value.cardId
@@ -171,18 +171,16 @@ class __$$PostImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
-class _$PostImpl extends _Post {
+@JsonSerializable()
+class _$PostImpl implements _Post {
   const _$PostImpl(
       {required this.userId,
       required this.userName,
       required this.date,
       required this.answer,
       required this.theme,
-      required this.good,
-      required this.cardId})
-      : super._();
+      required this.goodCount,
+      required this.cardId});
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostImplFromJson(json);
@@ -198,13 +196,13 @@ class _$PostImpl extends _Post {
   @override
   final String theme;
   @override
-  final int good;
+  final int goodCount;
   @override
   final String cardId;
 
   @override
   String toString() {
-    return 'Post(userId: $userId, userName: $userName, date: $date, answer: $answer, theme: $theme, good: $good, cardId: $cardId)';
+    return 'Post(userId: $userId, userName: $userName, date: $date, answer: $answer, theme: $theme, goodCount: $goodCount, cardId: $cardId)';
   }
 
   @override
@@ -218,14 +216,15 @@ class _$PostImpl extends _Post {
             (identical(other.date, date) || other.date == date) &&
             (identical(other.answer, answer) || other.answer == answer) &&
             (identical(other.theme, theme) || other.theme == theme) &&
-            (identical(other.good, good) || other.good == good) &&
+            (identical(other.goodCount, goodCount) ||
+                other.goodCount == goodCount) &&
             (identical(other.cardId, cardId) || other.cardId == cardId));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, userId, userName, date, answer, theme, good, cardId);
+      runtimeType, userId, userName, date, answer, theme, goodCount, cardId);
 
   @JsonKey(ignore: true)
   @override
@@ -241,16 +240,15 @@ class _$PostImpl extends _Post {
   }
 }
 
-abstract class _Post extends Post {
+abstract class _Post implements Post {
   const factory _Post(
       {required final String userId,
       required final String userName,
       required final String date,
       required final String answer,
       required final String theme,
-      required final int good,
+      required final int goodCount,
       required final String cardId}) = _$PostImpl;
-  const _Post._() : super._();
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
 
@@ -265,7 +263,7 @@ abstract class _Post extends Post {
   @override
   String get theme;
   @override
-  int get good;
+  int get goodCount;
   @override
   String get cardId;
   @override

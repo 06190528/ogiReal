@@ -19,7 +19,7 @@ mixin _$UserData {
   String? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   Image? get icon => throw _privateConstructorUsedError;
-  List<Post> get posts => throw _privateConstructorUsedError;
+  List<String> get userPostsCardIds => throw _privateConstructorUsedError;
   List<Follow> get follows => throw _privateConstructorUsedError;
   List<AbstractUserData> get followers => throw _privateConstructorUsedError;
   List<String> get goodCardIds => throw _privateConstructorUsedError;
@@ -38,7 +38,7 @@ abstract class $UserDataCopyWith<$Res> {
       {String? id,
       String? name,
       Image? icon,
-      List<Post> posts,
+      List<String> userPostsCardIds,
       List<Follow> follows,
       List<AbstractUserData> followers,
       List<String> goodCardIds});
@@ -60,7 +60,7 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
     Object? id = freezed,
     Object? name = freezed,
     Object? icon = freezed,
-    Object? posts = null,
+    Object? userPostsCardIds = null,
     Object? follows = null,
     Object? followers = null,
     Object? goodCardIds = null,
@@ -78,10 +78,10 @@ class _$UserDataCopyWithImpl<$Res, $Val extends UserData>
           ? _value.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as Image?,
-      posts: null == posts
-          ? _value.posts
-          : posts // ignore: cast_nullable_to_non_nullable
-              as List<Post>,
+      userPostsCardIds: null == userPostsCardIds
+          ? _value.userPostsCardIds
+          : userPostsCardIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       follows: null == follows
           ? _value.follows
           : follows // ignore: cast_nullable_to_non_nullable
@@ -110,7 +110,7 @@ abstract class _$$UserDataImplCopyWith<$Res>
       {String? id,
       String? name,
       Image? icon,
-      List<Post> posts,
+      List<String> userPostsCardIds,
       List<Follow> follows,
       List<AbstractUserData> followers,
       List<String> goodCardIds});
@@ -130,7 +130,7 @@ class __$$UserDataImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = freezed,
     Object? icon = freezed,
-    Object? posts = null,
+    Object? userPostsCardIds = null,
     Object? follows = null,
     Object? followers = null,
     Object? goodCardIds = null,
@@ -148,10 +148,10 @@ class __$$UserDataImplCopyWithImpl<$Res>
           ? _value.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as Image?,
-      posts: null == posts
-          ? _value._posts
-          : posts // ignore: cast_nullable_to_non_nullable
-              as List<Post>,
+      userPostsCardIds: null == userPostsCardIds
+          ? _value._userPostsCardIds
+          : userPostsCardIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       follows: null == follows
           ? _value._follows
           : follows // ignore: cast_nullable_to_non_nullable
@@ -175,11 +175,11 @@ class _$UserDataImpl implements _UserData {
       {required this.id,
       required this.name,
       required this.icon,
-      required final List<Post> posts,
+      required final List<String> userPostsCardIds,
       required final List<Follow> follows,
       required final List<AbstractUserData> followers,
       required final List<String> goodCardIds})
-      : _posts = posts,
+      : _userPostsCardIds = userPostsCardIds,
         _follows = follows,
         _followers = followers,
         _goodCardIds = goodCardIds;
@@ -190,12 +190,13 @@ class _$UserDataImpl implements _UserData {
   final String? name;
   @override
   final Image? icon;
-  final List<Post> _posts;
+  final List<String> _userPostsCardIds;
   @override
-  List<Post> get posts {
-    if (_posts is EqualUnmodifiableListView) return _posts;
+  List<String> get userPostsCardIds {
+    if (_userPostsCardIds is EqualUnmodifiableListView)
+      return _userPostsCardIds;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_posts);
+    return EqualUnmodifiableListView(_userPostsCardIds);
   }
 
   final List<Follow> _follows;
@@ -224,7 +225,7 @@ class _$UserDataImpl implements _UserData {
 
   @override
   String toString() {
-    return 'UserData(id: $id, name: $name, icon: $icon, posts: $posts, follows: $follows, followers: $followers, goodCardIds: $goodCardIds)';
+    return 'UserData(id: $id, name: $name, icon: $icon, userPostsCardIds: $userPostsCardIds, follows: $follows, followers: $followers, goodCardIds: $goodCardIds)';
   }
 
   @override
@@ -235,7 +236,8 @@ class _$UserDataImpl implements _UserData {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.icon, icon) || other.icon == icon) &&
-            const DeepCollectionEquality().equals(other._posts, _posts) &&
+            const DeepCollectionEquality()
+                .equals(other._userPostsCardIds, _userPostsCardIds) &&
             const DeepCollectionEquality().equals(other._follows, _follows) &&
             const DeepCollectionEquality()
                 .equals(other._followers, _followers) &&
@@ -249,7 +251,7 @@ class _$UserDataImpl implements _UserData {
       id,
       name,
       icon,
-      const DeepCollectionEquality().hash(_posts),
+      const DeepCollectionEquality().hash(_userPostsCardIds),
       const DeepCollectionEquality().hash(_follows),
       const DeepCollectionEquality().hash(_followers),
       const DeepCollectionEquality().hash(_goodCardIds));
@@ -266,7 +268,7 @@ abstract class _UserData implements UserData {
       {required final String? id,
       required final String? name,
       required final Image? icon,
-      required final List<Post> posts,
+      required final List<String> userPostsCardIds,
       required final List<Follow> follows,
       required final List<AbstractUserData> followers,
       required final List<String> goodCardIds}) = _$UserDataImpl;
@@ -278,7 +280,7 @@ abstract class _UserData implements UserData {
   @override
   Image? get icon;
   @override
-  List<Post> get posts;
+  List<String> get userPostsCardIds;
   @override
   List<Follow> get follows;
   @override

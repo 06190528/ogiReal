@@ -21,7 +21,7 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
       return;
     }
     UserData? userData =
-        await UserDataService().fetchUserDataFromFireBase(userId);
+        await UserDataService().fetchUserDataFromFirebase(userId);
     if (userData != null) {
       ref.read(userDataProvider.notifier).state = userData;
     } else {
@@ -44,7 +44,7 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
     initializeMessaging();
     await getTodayUsersPostsAndTheme(ref, globalDate);
   } catch (e) {
-    print('Error fetching user data: $e');
+    print('Error fetching user data initialize: $e');
   }
 }
 
@@ -90,28 +90,31 @@ Future<void> initializeMessaging() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }
 
-Future<void> getTodayUsersPostsAndTheme(WidgetRef ref, String date) async {
+Future<void> getTodayUsersPostsAndTheme(
+    WidgetRef ref, String globalDate) async {
   try {
     print('Fetching today\'s users posts and theme');
-    DocumentSnapshot dateDocRef = await FirebaseFirestore.instance
-        .collection('dateData')
+    DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
+        .collection('theme')
         .doc(globalDate)
         .get();
 
-    if (dateDocRef.exists && dateDocRef.data() != null) {
-      Map<String, dynamic> data = dateDocRef.data() as Map<String, dynamic>;
+    // 日付フィールドを使ってusersPostsコレクションからドキュメントを検索
+    QuerySnapshot usersPostsQuery = await FirebaseFirestore.instance
+        .collection('usersPosts')
+        .where('date', isEqualTo: globalDate)
+        .get();
 
-      // テーマの取得と設定
-      String theme =
-          data['theme'] as String? ?? 'デフォルトテーマ'; // nullの場合はデフォルトテーマを使用
+    if (themeDocRef.exists && themeDocRef.data() != null) {
+      Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
+      String theme = data['theme'] as String? ?? 'デフォルトテーマ';
       ref.read(nowThemeProvider.notifier).state = theme;
 
-      // 投稿リストの取得と設定
-      if (data.containsKey('usersPosts')) {
-        List<dynamic> postsList = data['usersPosts'] as List<dynamic>;
-        List<Post> usersPosts = postsList.map((postData) {
-          return Post.fromJson(postData as Map<String, dynamic>);
-        }).toList();
+      List<Post> usersPosts = usersPostsQuery.docs
+          .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      if (usersPosts.isNotEmpty) {
         ref.read(usersPostsProvider.notifier).state = usersPosts;
       } else {
         ref.read(usersPostsProvider.notifier).state = [];
@@ -120,6 +123,6 @@ Future<void> getTodayUsersPostsAndTheme(WidgetRef ref, String date) async {
       print('Date data or theme data is not available.');
     }
   } catch (e) {
-    print('Error fetching user data: $e');
+    print('Error fetching user data getTodayUsersPostsAndTheme: $e');
   }
 }

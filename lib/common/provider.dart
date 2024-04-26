@@ -6,7 +6,7 @@ const defaultUserData = UserData(
   id: null,
   name: null,
   icon: null,
-  posts: [],
+  userPostsCardIds: [],
   follows: [],
   followers: [],
   goodCardIds: [],

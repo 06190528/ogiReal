@@ -1,25 +1,32 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
-import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
 final ogiriCardsProvider = StateProvider<List<OgiriCard>>((ref) => []);
 
 void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
-  ref.read(heartToggleProvider(post.cardId).notifier).state = !isLiked;
-  UserData userData = ref.read(userDataProvider);
-  List<String> goodCardIds = List<String>.from(userData.goodCardIds);
-  if (isLiked) {
+  final userData = ref.read(userDataProvider);
+  final goodCardIds = List<String>.from(userData.goodCardIds);
+  var targetCardGoodCount = post.goodCount;
+  if (userData.id == null) return;
+
+  if (isLiked && goodCardIds.contains(post.cardId)) {
     goodCardIds.remove(post.cardId);
-  } else {
+    ref
+        .read(targetCardProvider(post.cardId).notifier)
+        .update((state) => state.copyWith(goodCount: targetCardGoodCount--));
+  } else if (!isLiked && !goodCardIds.contains(post.cardId)) {
     goodCardIds.add(post.cardId);
+    ref
+        .read(targetCardProvider(post.cardId).notifier)
+        .update((state) => state.copyWith(
+              goodCount: targetCardGoodCount++,
+            ));
   }
-  //userDataにcardIdを追加(自分のデータ)
   UserDataService().saveUserDataToFirebase(ref, 'goodCardIds', goodCardIds);
-  //usersPostsのgoodをインクリメント（みんなのデータ）
-  changeTargetUserCardGood(ref, post, isLiked);
-  //押したuserのuserDataのPostのgoodをインクリメント（他人のデータ）
-  changeTargetUserPostGood(ref, post, isLiked);
+  changeTargetCardGood(ref, post, isLiked);
 }

@@ -59,7 +59,7 @@ class PostScene extends ConsumerWidget {
                   context: context,
                   text: "本当に投稿しますか？",
                   onConfirm: () {
-                    savePostCardToFirebase(ref);
+                    createAndSavePostCardToFirebase(ref);
                     ref.read(textControllerStateProvider).text = '';
                     ToastWidget.showToast('投稿が完了しました', width, height, context);
                   },

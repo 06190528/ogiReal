@@ -12,7 +12,7 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       date: json['date'] as String,
       answer: json['answer'] as String,
       theme: json['theme'] as String,
-      good: json['good'] as int,
+      goodCount: json['goodCount'] as int,
       cardId: json['cardId'] as String,
     );
 
@@ -23,6 +23,6 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'date': instance.date,
       'answer': instance.answer,
       'theme': instance.theme,
-      'good': instance.good,
+      'goodCount': instance.goodCount,
       'cardId': instance.cardId,
     };

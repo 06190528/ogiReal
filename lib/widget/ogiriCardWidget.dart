@@ -9,8 +9,8 @@ import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
 final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
         (ref) => TextEditingController());
-final heartToggleProvider =
-    StateProvider.family<bool, String>((ref, id) => false);
+final targetCardProvider =
+    StateProvider.family<Post, String>((ref, id) => defaultPost);
 
 class OgiriCard extends ConsumerWidget {
   final double? cardWidth;
@@ -28,7 +28,10 @@ class OgiriCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLiked = ref.watch(heartToggleProvider(post?.cardId ?? ''));
+    final userId = ref.read(userDataProvider).id;
+    final targetCard = ref.watch(targetCardProvider(post?.cardId ?? ''));
+    final userData = ref.read(userDataProvider);
+    final isLiked = userData.goodCardIds.contains(post?.cardId ?? '');
     final textState = ref.read(postProvider);
     final theme = ref.watch(nowThemeProvider);
     final textController = ref.watch(textControllerStateProvider);
@@ -153,7 +156,7 @@ class OgiriCard extends ConsumerWidget {
                 Icon(Icons.favorite, size: height * 0.1, color: Colors.red),
                 SizedBox(width: width * 0.01),
                 Text(
-                  '×${post?.good ?? 0}',
+                  '×${post?.goodCount ?? 0}',
                   style: TextStyle(
                     fontSize: height * 0.07,
                     color: Colors.black,
