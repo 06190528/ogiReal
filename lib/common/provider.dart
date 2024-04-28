@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
+import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
 
 const defaultUserData = UserData(
   id: null,
@@ -19,6 +20,11 @@ final nowThemeProvider = StateProvider<String>((ref) {
   return 'default';
 });
 
-final usersPostsProvider = StateProvider<List<Post>>((ref) {
-  return [];
-});
+final usersPostCardIdsMapProvider =
+    StateProvider<Map<String, List<String>>>((ref) {
+  return {};
+}); //これはfirebaseから取得した全てのPostのcardIdのみを格納する
+
+final targetPostProvider = StateProvider.family<Post, String>((ref, carId) {
+  return defaultPost;
+});//usersPostsMapProviderを使ってPostを取得する

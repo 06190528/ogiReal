@@ -21,10 +21,11 @@ class PostScene extends ConsumerWidget {
           backgroundColor: themeColor,
           title: Column(
             children: [
-              const Text(
+              Text(
                 '新規投稿',
                 style: TextStyle(
                   color: themeTextColor,
+                  fontSize: height * 0.025,
                 ),
               ),
               Text('Time left: ${secondsLeft} seconds',

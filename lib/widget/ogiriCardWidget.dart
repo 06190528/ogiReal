@@ -1,40 +1,35 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
+import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/otherUserInfoScnene/otherUserInfoScnene.dart';
 import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
 
 final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
         (ref) => TextEditingController());
 
-final targetPostProvider = StateProvider.family<Post, int>((ref, index) {
-  return defaultPost;
-});
-
 class OgiriCard extends ConsumerWidget {
   final double? cardWidth;
   final double? cardHeight;
-  final int? index;
-  final Function(Post post, bool isLiked, int index)?
-      pushCardGoodButtonCallback;
+  final String? cardId;
+  final Function(Post post, bool isLiked)? pushCardGoodButtonCallback;
 
   OgiriCard({
     super.key,
     required this.cardWidth,
     required this.cardHeight,
-    required this.index,
+    required this.cardId,
     required this.pushCardGoodButtonCallback,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool posting = index == null;
-    final post =
-        posting ? defaultPost : ref.watch(targetPostProvider(index ?? 0));
+    final bool posting = cardId == null;
+    Post post =
+        posting ? defaultPost : ref.watch(targetPostProvider(cardId ?? '0'));
     final answer = posting ? '' : post.answer;
     final userData = ref.read(userDataProvider);
     final isLiked = userData.goodCardIds.contains(post.cardId);
@@ -50,7 +45,7 @@ class OgiriCard extends ConsumerWidget {
 
     return Card(
       color: Colors.white,
-      elevation: 4.0,
+      // elevation: 4.0,
       child: SizedBox(
         width: width,
         height: height,
@@ -100,8 +95,7 @@ class OgiriCard extends ConsumerWidget {
                       size: height * 0.12,
                     ),
                     onPressed: () {
-                      pushCardGoodButtonCallback?.call(
-                          post, isLiked, index ?? 0);
+                      pushCardGoodButtonCallback?.call(post, isLiked);
                     },
                   ),
                 ],
@@ -113,8 +107,8 @@ class OgiriCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(0),
               ),
               child: Container(
-                width: width * 0.6,
-                height: height * 0.4,
+                width: width * 0.7,
+                height: height * 0.5,
                 padding: EdgeInsets.all(height * 0.01),
                 alignment: Alignment.center, // 子ウィジェットを中央に揃える
                 child: posting
@@ -128,7 +122,7 @@ class OgiriCard extends ConsumerWidget {
                               textState.copyWith(answer: value);
                         },
                         style: TextStyle(
-                          fontSize: height * 0.07,
+                          fontSize: height * 0.5 * 0.3,
                           color: Colors.black,
                         ),
                         decoration: InputDecoration(
@@ -146,7 +140,7 @@ class OgiriCard extends ConsumerWidget {
                         answer,
                         textAlign: TextAlign.center, // Text ウィジェットのテキストも中央揃えに
                         style: TextStyle(
-                          fontSize: height * 0.07,
+                          fontSize: height * 0.5 * 0.2,
                           color: Colors.black,
                         ),
                       ),
@@ -167,8 +161,17 @@ class OgiriCard extends ConsumerWidget {
                 ),
                 Spacer(), // ユーザー名を右端に押し出すために使用
                 GestureDetector(
-                  onTap: () {
-                    print("tapped");
+                  onTap: () async {
+                    //コールバックで読んで
+                    if (posting) return;
+                    final otherUserData = await getTargetUserData(post.userId);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            OtherUserInfoScene(otherUserData: otherUserData),
+                      ),
+                    );
                   },
                   child: Text(
                     post.userName,

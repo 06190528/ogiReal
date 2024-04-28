@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
@@ -8,7 +6,7 @@ import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
 final ogiriCardsProvider = StateProvider<List<OgiriCard>>((ref) => []);
 
-void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked, int index) {
+void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
   final userData = ref.read(userDataProvider);
   final goodCardIds = List<String>.from(userData.goodCardIds);
   var targetCardGoodCount = post.goodCount;
@@ -21,18 +19,8 @@ void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked, int index) {
     goodCardIds.add(post.cardId);
     targetCardGoodCount++;
   }
-  updateTargetPost(ref, index, post.copyWith(goodCount: targetCardGoodCount));
+  ref.read(targetPostProvider(post.cardId).notifier).state =
+      post.copyWith(goodCount: targetCardGoodCount);
   UserDataService().saveUserDataToFirebase(ref, 'goodCardIds', goodCardIds);
   changeTargetCardGood(ref, post, isLiked);
-}
-
-void updateTargetPost(WidgetRef ref, int index, Post newPost) {
-  ref.read(targetPostProvider(index).notifier).update((state) => newPost);
-}
-
-void setAllUsersPosts(WidgetRef ref) {
-  final usersPosts = ref.read(usersPostsProvider);
-  for (int i = 0; i < usersPosts.length; i++) {
-    updateTargetPost(ref, i, usersPosts[i]);
-  }
 }

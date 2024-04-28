@@ -1,6 +1,5 @@
 import 'dart:io' as io;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_api_availability/google_api_availability.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
-import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/settingWidget.dart';
@@ -42,7 +40,6 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
       }
     }
     initializeMessaging();
-    await getTodayUsersPostsAndTheme(ref, globalDate);
   } catch (e) {
     print('Error fetching user data initialize: $e');
   }
@@ -63,7 +60,6 @@ Future<void> initializeMessaging() async {
     }
   }
 
-  // Request permission for push notifications
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     badge: true,
@@ -88,41 +84,4 @@ Future<void> initializeMessaging() async {
 
   // Handle background messages
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-}
-
-Future<void> getTodayUsersPostsAndTheme(
-    WidgetRef ref, String globalDate) async {
-  try {
-    print('Fetching today\'s users posts and theme');
-    DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
-        .collection('theme')
-        .doc(globalDate)
-        .get();
-
-    // 日付フィールドを使ってusersPostsコレクションからドキュメントを検索
-    QuerySnapshot usersPostsQuery = await FirebaseFirestore.instance
-        .collection('usersPosts')
-        .where('date', isEqualTo: globalDate)
-        .get();
-
-    if (themeDocRef.exists && themeDocRef.data() != null) {
-      Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
-      String theme = data['theme'] as String? ?? 'デフォルトテーマ';
-      ref.read(nowThemeProvider.notifier).state = theme;
-
-      List<Post> usersPosts = usersPostsQuery.docs
-          .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
-          .toList();
-
-      if (usersPosts.isNotEmpty) {
-        ref.read(usersPostsProvider.notifier).state = usersPosts;
-      } else {
-        ref.read(usersPostsProvider.notifier).state = [];
-      }
-    } else {
-      print('Date data or theme data is not available.');
-    }
-  } catch (e) {
-    print('Error fetching user data getTodayUsersPostsAndTheme: $e');
-  }
 }

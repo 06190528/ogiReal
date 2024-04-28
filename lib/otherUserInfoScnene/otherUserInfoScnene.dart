@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
-import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
 
-class UserInfoScene extends ConsumerWidget {
+class OtherUserInfoScene extends ConsumerWidget {
   static const String routeName = '/userInfo';
+  final UserData otherUserData;
+
+  OtherUserInfoScene({required this.otherUserData});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    final userData = ref.watch(userDataProvider);
+    print('otherUserData: $otherUserData');
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
-          backgroundColor: themeColor,
-          title: Text(
-            'ユーザ情報',
-            style: TextStyle(
-              color: themeTextColor,
-              fontSize: height * 0.025,
-            ),
-          )),
+        backgroundColor: themeColor,
+        title: Text(
+          'ユーザ情報',
+          style: TextStyle(
+            color: themeTextColor,
+            fontSize: height * 0.025,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back,
+              color: themeTextColor), // themeTextColor をアイコンの色として使用
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: UserInfoWidget(
         width: width,
         height: height,
-        userData: userData,
+        userData: otherUserData,
       ),
       bottomNavigationBar: BottomAppBar(
         color: themeColor,

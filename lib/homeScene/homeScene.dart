@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
+import 'package:ogireal_app/common/data/dataCustomClass.dart';
+import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/intialize.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/homeScene/homeSceneProvider.dart';
@@ -17,12 +19,12 @@ class HomeScene extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     initialize(ref, context);
     final userData = ref.watch(userDataProvider);
-    final usersPosts = ref.watch(usersPostsProvider);
+    final globalDateUsersPostCardIds =
+        ref.watch(usersPostCardIdsMapProvider)[globalDate];
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setAllUsersPosts(ref);
-    });
+
+    getGlobalDateUsersPostsAndTheme(ref, globalDate);
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
@@ -33,42 +35,46 @@ class HomeScene extends ConsumerWidget {
         ),
       ),
       body: Center(
-        child: Container(
-          width: width * 0.8,
-          child: usersPosts.isNotEmpty
-              ? ListView.builder(
-                  itemCount: usersPosts.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      margin: EdgeInsets.only(bottom: height * 0.02),
-                      child: OgiriCard(
-                        cardWidth: width * 0.8,
-                        cardHeight: height * 0.2,
-                        index: index,
-                        pushCardGoodButtonCallback: (post, isLiked, index) {
-                          if (post == null || post.userId == userData.id) {
-                            ToastWidget.showToast(
-                                '自分の投稿にはいいねできません', width, height, context);
-                            return;
-                          }
-                          pushCardGoodButton(ref, post!, isLiked, index ?? 0);
-                        },
-                      ),
-                    );
-                  },
-                )
-              : Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text(
-                    '本日の投稿はまだありません。',
-                    style: TextStyle(
-                      fontSize: height * 0.03,
-                      color: themeTextColor,
+        child: globalDateUsersPostCardIds != null &&
+                globalDateUsersPostCardIds.isNotEmpty
+            ? ListView.builder(
+                itemCount: globalDateUsersPostCardIds.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin: EdgeInsets.only(
+                        bottom: height * 0.01,
+                        left: width * 0.05,
+                        right: width * 0.05),
+                    child: OgiriCard(
+                      cardWidth: width * 0.8,
+                      cardHeight: width * 0.8 * 0.6,
+                      cardId: globalDateUsersPostCardIds[index],
+                      pushCardGoodButtonCallback: (
+                        post,
+                        isLiked,
+                      ) {
+                        if (post.userId == userData.id) {
+                          ToastWidget.showToast(
+                              '自分の投稿にはいいねできません', width, height, context);
+                          return;
+                        }
+                        pushCardGoodButton(ref, post, isLiked);
+                      },
                     ),
-                    textAlign: TextAlign.center,
+                  );
+                },
+              )
+            : Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  '本日の投稿はまだありません。',
+                  style: TextStyle(
+                    fontSize: height * 0.03,
+                    color: themeTextColor,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-        ),
+              ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: themeColor,
