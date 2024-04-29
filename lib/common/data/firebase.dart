@@ -8,7 +8,7 @@ import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScneneProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataService {

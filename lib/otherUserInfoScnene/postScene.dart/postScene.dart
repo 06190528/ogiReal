@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
-import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScneneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/dialog/configureDialogWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';

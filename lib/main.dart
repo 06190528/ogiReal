@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/firebase_options.dart';
 import 'package:ogireal_app/homeScene/homeScene.dart';
-import 'package:ogireal_app/postScene.dart/postScene.dart';
+import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScene.dart';
 import 'package:ogireal_app/userInfoScene/userInfoScene.dart';
 
 void main() async {

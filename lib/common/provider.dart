@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
-import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScneneProvider.dart';
 
 const defaultUserData = UserData(
   id: null,
@@ -27,4 +27,9 @@ final usersPostCardIdsMapProvider =
 
 final targetPostProvider = StateProvider.family<Post, String>((ref, carId) {
   return defaultPost;
-});//usersPostsMapProviderを使ってPostを取得する
+}); //usersPostsMapProviderを使ってPostを取得する
+
+final otherUserDataProvider =
+    StateProvider.family<UserData, String>((ref, userId) {
+  return defaultUserData;
+});

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/homeScene/homeScene.dart';
-import 'package:ogireal_app/postScene.dart/postScene.dart';
+import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScene.dart';
 import 'package:ogireal_app/userInfoScene/userInfoScene.dart';
 
 class CommonBottomAppBar extends StatelessWidget {
