@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
-import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
+import 'package:ogireal_app/widget/countDownAppBarWidget.dart';
 import 'package:ogireal_app/widget/dialog/configureDialogWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 import 'package:ogireal_app/widget/rectangleButtonWidget.dart';
@@ -14,26 +15,15 @@ class PostScene extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    final secondsLeft = ref.watch(countdownTimerProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await setCountDownToProvider(ref);
+    });
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
-          backgroundColor: themeColor,
-          title: Column(
-            children: [
-              Text(
-                '新規投稿',
-                style: TextStyle(
-                  color: themeTextColor,
-                  fontSize: height * 0.025,
-                ),
-              ),
-              Text('Time left: ${secondsLeft} seconds',
-                  style: TextStyle(
-                    color: themeTextColor,
-                  )),
-            ],
-          )),
+        backgroundColor: themeColor,
+        title: CountDownAppBarWidget(),
+      ),
       body: Container(
         width: width,
         child: Column(

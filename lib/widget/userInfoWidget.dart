@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/userInfoScene/userInfoSceneProvider.dart';
+import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
 class UserInfoWidget extends ConsumerWidget {
@@ -20,8 +22,9 @@ class UserInfoWidget extends ConsumerWidget {
     final List<String> usersPostCardIds =
         ref.watch(usersPostCardIdsMapProvider)[userData.id] ?? [];
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await setTargetUserAllPosts(userData, ref);
-      print('usersPostCardIds: $usersPostCardIds');
+      if (userData.id == ref.read(userDataProvider).id) {
+        await setTargetUserAllPosts(userData, ref); //こいつさえいなければクラッシュしない
+      }
     });
 
     return Column(

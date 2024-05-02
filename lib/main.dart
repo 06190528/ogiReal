@@ -4,9 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/firebase_options.dart';
-import 'package:ogireal_app/homeScene/homeScene.dart';
-import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScene.dart';
-import 'package:ogireal_app/userInfoScene/userInfoScene.dart';
+import 'package:ogireal_app/scene/homeScene/homeScene.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScene.dart';
+import 'package:ogireal_app/scene/userInfoScene/userInfoScene.dart';
 
 void main() async {
   // debugPaintSizeEnabled = true; // UIのデバッグを有効にする
@@ -22,9 +22,9 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Your App',
       initialRoute: HomeScene.routeName, // 初期ルートを指定

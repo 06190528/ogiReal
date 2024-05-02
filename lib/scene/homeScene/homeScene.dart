@@ -5,7 +5,7 @@ import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/intialize.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/homeScene/homeSceneProvider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 import 'package:ogireal_app/widget/toastWidget.dart';
@@ -24,7 +24,8 @@ class HomeScene extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    getGlobalDateUsersPostsAndTheme(ref, globalDate);
+    getGlobalDateUsersPosts(ref, globalDate);
+    setThemeToProviderFromFirebase(ref);
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(

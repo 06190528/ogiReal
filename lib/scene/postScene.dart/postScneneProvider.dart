@@ -53,6 +53,15 @@ class CountdownTimerNotifier extends StateNotifier<int> {
     _timer?.cancel();
     super.dispose();
   }
+
+  void setCountdown(int inSeconds) {
+    state = inSeconds;
+    if (inSeconds > 0) {
+      startTimer();
+    } else {
+      stopTimer();
+    }
+  }
 }
 
 Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
@@ -95,5 +104,17 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
         .set(updatedPost.toJson());
   } catch (e) {
     print('投稿エラー: $e');
+  }
+}
+
+Future<void> setCountDownToProvider(WidgetRef ref) async {
+  DateTime now = DateTime.now();
+
+  // 現在時刻が指定された時間範囲内にあるかどうかを判定します。
+  if (now.isAfter(globalStartAt) && now.isBefore(globalEndAt)) {
+    Duration remaining = globalEndAt.difference(now);
+    ref.read(countdownTimerProvider.notifier).setCountdown(remaining.inSeconds);
+  } else {
+    ref.read(countdownTimerProvider.notifier).setCountdown(0);
   }
 }

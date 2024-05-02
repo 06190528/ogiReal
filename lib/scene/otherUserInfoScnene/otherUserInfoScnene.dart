@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
+import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
 
 class OtherUserInfoScene extends ConsumerWidget {
   static const String routeName = '/userInfo';
-  final UserData otherUserData;
+  final String userId;
 
-  OtherUserInfoScene({required this.otherUserData});
+  OtherUserInfoScene({required this.userId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    print('otherUserData: $otherUserData');
+    final otherUserData = ref.watch(otherUserDataProvider(userId));
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(

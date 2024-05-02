@@ -4,8 +4,8 @@ import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/otherUserInfoScnene/otherUserInfoScnene.dart';
-import 'package:ogireal_app/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/scene/otherUserInfoScnene/otherUserInfoScnene.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 
 final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
@@ -30,12 +30,17 @@ class OgiriCard extends ConsumerWidget {
     final bool posting = cardId == null;
     Post post =
         posting ? defaultPost : ref.watch(targetPostProvider(cardId ?? '0'));
-    final answer = posting ? '' : post.answer;
+    String answer = post.answer;
     final userData = ref.read(userDataProvider);
     final isLiked = userData.goodCardIds.contains(post.cardId);
     final textState = ref.read(postProvider);
-    final theme = ref.watch(nowThemeProvider);
+    String theme = post.theme;
     final textController = ref.watch(textControllerStateProvider);
+    if (posting) {
+      //投稿シーンの時
+      answer = '';
+      theme = ref.watch(nowThemeProvider);
+    }
     final width = cardWidth ?? 0;
     final height = cardHeight ?? 0;
 
@@ -164,12 +169,12 @@ class OgiriCard extends ConsumerWidget {
                   onTap: () async {
                     //コールバックで読んで
                     if (posting) return;
-                    final otherUserData = await getTargetUserData(post.userId);
+                    await getTargetUserData(ref, post.userId);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            OtherUserInfoScene(otherUserData: otherUserData),
+                            OtherUserInfoScene(userId: post.userId),
                       ),
                     );
                   },

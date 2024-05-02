@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
-import 'package:ogireal_app/homeScene/homeScene.dart';
-import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScene.dart';
-import 'package:ogireal_app/userInfoScene/userInfoScene.dart';
+import 'package:ogireal_app/scene/homeScene/homeScene.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScene.dart';
+import 'package:ogireal_app/scene/userInfoScene/userInfoScene.dart';
 
 class CommonBottomAppBar extends StatelessWidget {
   final WidgetRef ref;
@@ -58,11 +58,12 @@ class CommonBottomAppBar extends StatelessWidget {
 
   void _navigateWithoutAnimation(
       BuildContext context, String routeName, WidgetRef ref) {
-    if (canGoNextScene(ref))
+    if (canGoNextScene(ref)) {
       Navigator.of(context).pushReplacement(PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => _getPage(routeName),
         transitionDuration: Duration.zero, // アニメーションの時間を0に設定
       ));
+    }
   }
 
   Widget _getPage(String routeName) {

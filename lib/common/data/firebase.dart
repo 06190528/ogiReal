@@ -4,11 +4,12 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/otherUserInfoScnene/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataService {
@@ -87,32 +88,30 @@ class UserDataService {
   }
 }
 
+Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
+  if (ref.read(nowThemeProvider) == 'default') {
+    DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
+        .collection('theme')
+        .doc(globalDate)
+        .get();
+    if (themeDocRef.exists && themeDocRef.data() != null) {
+      Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
+      String theme = data['theme'] as String? ?? 'デフォルトテーマ';
+      ref.read(nowThemeProvider.notifier).state = theme;
+    } else {
+      print('Date data or theme data is not available.');
+    }
+  }
+}
+
 //新しいusersPostCardIdsMapProviderを作成し同じでなければ代入して変更を通知
 //firebaseから同じものは取らないようにする.
-Future<void> getGlobalDateUsersPostsAndTheme(
-    WidgetRef ref, String globalDate) async {
+Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
   try {
-    if (ref.read(nowThemeProvider) == 'default') {
-      print('Fetching today\'s theme');
-      DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
-          .collection('theme')
-          .doc(globalDate)
-          .get();
-      if (themeDocRef.exists && themeDocRef.data() != null) {
-        Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
-        String theme = data['theme'] as String? ?? 'デフォルトテーマ';
-        ref.read(nowThemeProvider.notifier).state = theme;
-      } else {
-        print('Date data or theme data is not available.');
-      }
-    }
-
     final List<String>? globalDateUsersPostsCardIdsMap =
-        ref.read(usersPostCardIdsMapProvider.state).state[globalDate];
-
-    //変更が反映されるまでに時間がかかるのでこの中に回入っている
-    if (globalDateUsersPostsCardIdsMap == null ||
-        globalDateUsersPostsCardIdsMap.isEmpty) {
+        ref.read(usersPostCardIdsMapProvider)[globalDate];
+    if (globalDateUsersPostsCardIdsMap == null) {
+      //まだ誰も投稿していない時の処理
       print('Fetching today\'s users posts ');
       QuerySnapshot usersPostsQuery = await FirebaseFirestore.instance
           .collection('usersPosts')
@@ -122,25 +121,19 @@ Future<void> getGlobalDateUsersPostsAndTheme(
       List<Post> usersPosts = usersPostsQuery.docs
           .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
-      List<String> setCardIds = [];
-      Map<String, List<String>> addNewUsersPostCardIdsMap = {};
       if (usersPosts.isNotEmpty) {
         for (int i = 0; i < usersPosts.length; i++) {
-          if (await setTargetPostProviderFromFirebase(
-              ref, usersPosts[i].cardId)) {
-            setCardIds.add(usersPosts[i].cardId);
+          final String cardId = usersPosts[i].cardId;
+          if (await setTargetPostProviderFromFirebase(ref, cardId)) {
+            await setUsersPostCardIdMapProvider(ref, cardId, globalDate);
           }
         }
-        addNewUsersPostCardIdsMap.addAll({
-          globalDate: setCardIds,
-        });
-      } else {
-        addNewUsersPostCardIdsMap.addAll({
-          globalDate: [],
-        });
       }
+    }
 
-      setUsersPostCardIdsMapProvider(ref, addNewUsersPostCardIdsMap);
+    if (ref.read(usersPostCardIdsMapProvider)[globalDate] == null) {
+      //まだ誰も投稿していない
+      ref.read(usersPostCardIdsMapProvider.state).state[globalDate] = [];
     }
     // 日付フィールドを使ってusersPostsコレクションからドキュメントを検索
   } catch (e) {
@@ -179,14 +172,18 @@ Future<bool> setTargetPostProviderFromFirebase(
   return true;
 }
 
-Future<UserData> getTargetUserData(String targetUserId) async {
+Future<void> getTargetUserData(WidgetRef ref, String targetUserId) async {
+  if (ref.read(otherUserDataProvider(targetUserId)) != defaultUserData) {
+    return ref.read(otherUserDataProvider(targetUserId));
+  }
   UserData targetUserData = defaultUserData;
   try {
     targetUserData =
         await UserDataService().fetchUserDataFromFirebase(targetUserId) ??
             defaultUserData;
+    ref.read(otherUserDataProvider(targetUserId).notifier).state =
+        targetUserData;
   } catch (e) {
     print('Error fetching target user data: $e');
   }
-  return targetUserData;
 }
