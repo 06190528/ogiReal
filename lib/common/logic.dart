@@ -4,6 +4,7 @@ import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 
 void navigateAndRemoveUntil(
@@ -18,10 +19,9 @@ bool canGoNextScene(WidgetRef ref) {
   bool canGo = false;
   final userData = ref.read(userDataProvider);
   final theme = ref.read(nowThemeProvider);
-  final usersPostCardIdsMap = ref.read(usersPostCardIdsMapProvider);
   if (userData != defaultUserData &&
       theme != 'default' &&
-      usersPostCardIdsMap[globalDate] != null) {
+      loadingUserPosts == false) {
     //usersPosts設定されているkeyのvalueがあるかどうか確認しないとあかん
     canGo = true;
   }
@@ -43,17 +43,24 @@ Future<void> setTargetUserAllPosts(UserData userData, WidgetRef ref) async {
     if (ref.read(targetPostProvider(userPostCardId)) != defaultPost ||
         await setTargetPostProviderFromFirebase(ref, userPostCardId)) {
       //ここれがあるかないかでクラッシュする
-      await setUsersPostCardIdMapProvider(ref, userPostCardId, userId);
+      await setUsersPostCardIdToMapProvider(ref, userPostCardId, userId);
     }
   }
   await Future.delayed(Duration(seconds: 5));
 }
 
-Future<void> setUsersPostCardIdMapProvider(
+Future<void> setUsersPostCardIdToMapProvider(
     WidgetRef ref, String cardId, String key) async {
   Map<String, List<String>> currentMap = Map<String, List<String>>.from(
       ref.read(usersPostCardIdsMapProvider.state).state);
   currentMap.update(key, (value) => value..add(cardId),
       ifAbsent: () => [cardId]);
+  ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;
+}
+
+void updateUsersPostCardIds(WidgetRef ref, List<String> newCardIds) {
+  Map<String, List<String>> currentMap =
+      Map.from(ref.read(usersPostCardIdsMapProvider));
+  currentMap[globalDate] = newCardIds;
   ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;
 }

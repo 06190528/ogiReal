@@ -38,7 +38,8 @@ class UserInfoWidget extends ConsumerWidget {
             child: Text(
               userName,
               style: TextStyle(
-                fontSize: adjustFontSize(userName, height * 0.08 * 2, 20),
+                fontSize: adjustFontSize(
+                    userName, height * 0.08 * 2, height * 0.08 * 2, 10),
                 color: Colors.white, // テキストの色
                 fontWeight: FontWeight.bold,
               ),

@@ -43,7 +43,6 @@ class GlobalData {
         endAt = DateTime.now(); // デフォルトの値を設定
 
   Future<void> initializeTodayDate() async {
-    print('initializeTodayDate');
     var todayDateDoc = await FirebaseFirestore.instance
         .collection('todayDate')
         .doc('todayDate')

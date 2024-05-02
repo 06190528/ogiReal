@@ -7,12 +7,16 @@ class RectangleButtonWidget extends StatelessWidget {
   final double width;
   final double height;
   final VoidCallback onPressed;
+  final ButtonStyle? buttonStyle;
+  final TextStyle? textStyle;
 
   RectangleButtonWidget({
     required this.text,
     required this.width,
     required this.height,
     required this.onPressed,
+    this.buttonStyle, // nullableにすることで、必須ではないパラメータに
+    this.textStyle, // デフォルト値を設定しない場合は null が許容されます
   });
 
   @override
@@ -22,21 +26,22 @@ class RectangleButtonWidget extends StatelessWidget {
       height: height,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue, // ボタンの背景色
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5), // 角丸の半径を設定
-          ),
-        ),
+        style: buttonStyle ??
+            ElevatedButton.styleFrom(
+              // デフォルトのスタイル設定をここに追加可能
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
         child: Center(
-          // CenterウィジェットでTextを囲むことで中央配置を保証
           child: Text(
             text,
-            style: TextStyle(
-              color: themeTextColor, // テキストの色
-              fontSize: height * 0.6, // フォントサイズを高さに基づいて適切に設定
-            ),
-            textAlign: TextAlign.center, // テキストを中央揃えに
+            style: textStyle ??
+                const TextStyle(
+                  fontSize: 16, // デフォルトフォントサイズ
+                  color: Colors.white, // デフォルトテキストカラー
+                ),
+            maxLines: 1,
           ),
         ),
       ),

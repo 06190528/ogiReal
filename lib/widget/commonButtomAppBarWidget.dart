@@ -3,18 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/scene/homeScene/homeScene.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScene.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoScene.dart';
 
 class CommonBottomAppBar extends StatelessWidget {
   final WidgetRef ref;
+  final double height;
 
-  const CommonBottomAppBar({super.key, required this.ref});
+  const CommonBottomAppBar(
+      {super.key, required this.ref, required this.height});
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     final currentRouteName = ModalRoute.of(context)?.settings.name;
-
     return BottomAppBar(
       color: themeColor,
       child: Container(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
-import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
@@ -38,11 +37,9 @@ class OtherUserInfoScene extends ConsumerWidget {
         height: height,
         userData: otherUserData,
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: themeColor,
-        child: CommonBottomAppBar(
-          ref: ref,
-        ),
+      bottomNavigationBar: CommonBottomAppBar(
+        ref: ref,
+        height: height * 0.8,
       ),
     );
   }

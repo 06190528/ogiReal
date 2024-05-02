@@ -28,11 +28,9 @@ class UserInfoScene extends ConsumerWidget {
         height: height,
         userData: userData,
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: themeColor,
-        child: CommonBottomAppBar(
-          ref: ref,
-        ),
+      bottomNavigationBar: CommonBottomAppBar(
+        ref: ref,
+        height: height * 0.8,
       ),
     );
   }

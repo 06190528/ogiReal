@@ -9,6 +9,7 @@ import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -111,8 +112,8 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
     final List<String>? globalDateUsersPostsCardIdsMap =
         ref.read(usersPostCardIdsMapProvider)[globalDate];
     if (globalDateUsersPostsCardIdsMap == null) {
+      loadingUserPosts = true;
       //まだ誰も投稿していない時の処理
-      print('Fetching today\'s users posts ');
       QuerySnapshot usersPostsQuery = await FirebaseFirestore.instance
           .collection('usersPosts')
           .where('date', isEqualTo: globalDate)
@@ -125,10 +126,11 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
         for (int i = 0; i < usersPosts.length; i++) {
           final String cardId = usersPosts[i].cardId;
           if (await setTargetPostProviderFromFirebase(ref, cardId)) {
-            await setUsersPostCardIdMapProvider(ref, cardId, globalDate);
+            await setUsersPostCardIdToMapProvider(ref, cardId, globalDate);
           }
         }
       }
+      loadingUserPosts = false;
     }
 
     if (ref.read(usersPostCardIdsMapProvider)[globalDate] == null) {

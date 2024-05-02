@@ -6,8 +6,10 @@ import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/intialize.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
+import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
+import 'package:ogireal_app/widget/rectangleButtonWidget.dart';
 import 'package:ogireal_app/widget/toastWidget.dart';
 
 class HomeScene extends ConsumerWidget {
@@ -23,16 +25,54 @@ class HomeScene extends ConsumerWidget {
         ref.watch(usersPostCardIdsMapProvider)[globalDate];
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
+    final toolBarHeight = height * 0.08;
+    final nowSelectSortType = ref.watch(nowSelectSortTypeProvider);
     getGlobalDateUsersPosts(ref, globalDate);
     setThemeToProviderFromFirebase(ref);
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
         backgroundColor: themeColor,
-        title: Text(
-          '大喜Real.',
-          style: TextStyle(color: themeTextColor, fontSize: height * 0.025),
+        toolbarHeight: toolBarHeight,
+        title: Column(
+          children: [
+            Text(
+              '大喜Real.',
+              style: TextStyle(
+                  color: themeTextColor, fontSize: toolBarHeight * 0.4),
+            ),
+            SizedBox(height: height * 0.01),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // ボタン間の間隔を均等にする
+              children: [
+                for (var sortType in sortTypes)
+                  RectangleButtonWidget(
+                      text: sortType,
+                      width: width * 0.3,
+                      height: toolBarHeight * 0.4,
+                      onPressed: () {
+                        sortGlobalDateUsersPostCardIds(ref, sortType);
+                        ref.read(nowSelectSortTypeProvider.state).state =
+                            sortType;
+                      },
+                      buttonStyle: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(themeTextColor),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(1.0),
+                          ),
+                        ),
+                      ),
+                      textStyle: TextStyle(
+                          color: themeColor,
+                          fontSize: adjustFontSize(
+                              sortType, width * 0.2, toolBarHeight * 0.5, 10))),
+              ],
+            ),
+            SizedBox(height: height * 0.01),
+          ],
         ),
       ),
       body: Center(
@@ -77,11 +117,9 @@ class HomeScene extends ConsumerWidget {
                 ),
               ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: themeColor,
-        child: CommonBottomAppBar(
-          ref: ref,
-        ),
+      bottomNavigationBar: CommonBottomAppBar(
+        ref: ref,
+        height: height * 0.08,
       ),
     );
   }

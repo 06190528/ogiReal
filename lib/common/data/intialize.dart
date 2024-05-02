@@ -51,7 +51,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> initializeMessaging() async {
-  print('initializeMessaging');
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   final String? fcmToken = await FirebaseMessaging.instance.getToken();
   print("FCM Token: $fcmToken");
@@ -114,5 +113,4 @@ Future<void> handleForegroundNotification(
   RemoteMessage message,
 ) async {
   // restartApp(); // アRプリをリスタートする
-  print('handleForegroundNotification');
 }
