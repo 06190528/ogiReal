@@ -9,7 +9,8 @@ class CountDownAppBarWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final secondsLeft = ref.watch(countdownTimerProvider);
-    final minutes = (secondsLeft ~/ 60).toString().padLeft(2, '0');
+    final hours = (secondsLeft ~/ 3600).toString().padLeft(2, '');
+    final minutes = ((secondsLeft % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (secondsLeft % 60).toString().padLeft(2, '0');
     final height = MediaQuery.of(context).size.height;
     return Column(
@@ -23,7 +24,7 @@ class CountDownAppBarWidget extends ConsumerWidget {
         ),
         if (secondsLeft > 0)
           Text(
-            '残り時間 $minutes:$seconds',
+            '残り時間 $hours:$minutes:$seconds',
             style: TextStyle(
               color: themeTextColor,
               fontSize: height * 0.02,

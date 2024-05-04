@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
-import 'package:ogireal_app/common/data/intialize.dart';
+import 'package:ogireal_app/common/intialize.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';

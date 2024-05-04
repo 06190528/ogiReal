@@ -18,6 +18,10 @@ final postProvider = StateProvider<Post>((ref) {
   return defaultPost;
 });
 
+final todayUserCanPostCountProvider = StateProvider<int>((ref) {
+  return 0;
+});
+
 const defaultPost = Post(
   userName: '',
   userId: '',
@@ -117,4 +121,44 @@ Future<void> setCountDownToProvider(WidgetRef ref) async {
   } else {
     ref.read(countdownTimerProvider.notifier).setCountdown(0);
   }
+}
+
+Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
+  print('todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
+  final UserData userData = ref.read(userDataProvider);
+  final List<String> userPostCardIds = userData.userPostsCardIds;
+
+  bool alredayPosted = false;
+  int todayUserPostedCount = 0;
+  for (var cardId in userPostCardIds) {
+    final parts = cardId.split('_');
+    final cardDate = parts[0];
+    if (cardDate == globalDate) {
+      alredayPosted = true;
+      final timeStr = parts[1];
+      final formattedTime =
+          "${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}:${timeStr.substring(4, 6)}";
+      final cardDateTime = DateTime.parse('$cardDate $formattedTime');
+      final startDateTime = DateTime.parse(globalStartAt.toString());
+      final endDateTime = DateTime.parse(globalEndAt.toString());
+      if (startDateTime.isBefore(cardDateTime) &&
+          cardDateTime.isBefore(endDateTime)) {
+        todayUserPostedCount++;
+      }
+    }
+  }
+  if (!alredayPosted) {
+    print('alredayPosted: $alredayPosted');
+    ref.read(todayUserCanPostCountProvider.state).state = 1;
+    print(
+        'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
+  } else {
+    pragma('alredayPosted: $alredayPosted');
+    ref.read(todayUserCanPostCountProvider.state).state =
+        3 - todayUserPostedCount;
+    print(
+        'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
+  }
+  print(
+      'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
 }

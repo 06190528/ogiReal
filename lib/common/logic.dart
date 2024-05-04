@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_launcher_icons/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
@@ -25,6 +26,10 @@ bool canGoNextScene(WidgetRef ref) {
     //usersPosts設定されているkeyのvalueがあるかどうか確認しないとあかん
     canGo = true;
   }
+  print('userData: $userData');
+  print('theme: $theme');
+  print('loadingUserPosts: $loadingUserPosts');
+  print('canGo: $canGo');
   return canGo;
 }
 
@@ -53,6 +58,9 @@ Future<void> setUsersPostCardIdToMapProvider(
     WidgetRef ref, String cardId, String key) async {
   Map<String, List<String>> currentMap = Map<String, List<String>>.from(
       ref.read(usersPostCardIdsMapProvider.state).state);
+  if (currentMap[key] != null) {
+    if (currentMap[key]!.contains(cardId)) return;
+  }
   currentMap.update(key, (value) => value..add(cardId),
       ifAbsent: () => [cardId]);
   ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;

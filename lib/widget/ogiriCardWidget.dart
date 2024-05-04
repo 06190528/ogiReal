@@ -127,7 +127,7 @@ class OgiriCard extends ConsumerWidget {
                               textState.copyWith(answer: value);
                         },
                         style: TextStyle(
-                          fontSize: height * 0.5 * 0.3,
+                          fontSize: height * 0.5 * 0.2,
                           color: Colors.black,
                         ),
                         decoration: InputDecoration(

@@ -109,6 +109,7 @@ Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
 //firebaseから同じものは取らないようにする.
 Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
   try {
+    print('getGlobalDateUsersPosts');
     final List<String>? globalDateUsersPostsCardIdsMap =
         ref.read(usersPostCardIdsMapProvider)[globalDate];
     if (globalDateUsersPostsCardIdsMap == null) {
@@ -123,6 +124,7 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
           .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       if (usersPosts.isNotEmpty) {
+        print('usersPosts.isNotEmpty');
         for (int i = 0; i < usersPosts.length; i++) {
           final String cardId = usersPosts[i].cardId;
           if (await setTargetPostProviderFromFirebase(ref, cardId)) {
@@ -136,6 +138,7 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
     if (ref.read(usersPostCardIdsMapProvider)[globalDate] == null) {
       //まだ誰も投稿していない
       ref.read(usersPostCardIdsMapProvider.state).state[globalDate] = [];
+      print('no usersPosts');
     }
     // 日付フィールドを使ってusersPostsコレクションからドキュメントを検索
   } catch (e) {
@@ -189,3 +192,10 @@ Future<void> getTargetUserData(WidgetRef ref, String targetUserId) async {
     print('Error fetching target user data: $e');
   }
 }
+
+
+// Future<void> setUserCardIdToFIrebaseDateUserPostCardIds(DateTime date, String cardId) async {
+//   final dateStr = date.toString();
+//   final docRef = FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(dateStr);
+  
+// }   

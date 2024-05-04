@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:ogireal_app/common/const.dart';
 
 class RectangleButtonWidget extends StatelessWidget {
   final String text;
