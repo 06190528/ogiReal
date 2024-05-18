@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_launcher_icons/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,4 +73,18 @@ void updateUsersPostCardIds(WidgetRef ref, List<String> newCardIds) {
       Map.from(ref.read(usersPostCardIdsMapProvider));
   currentMap[globalDate] = newCardIds;
   ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;
+}
+
+// フォアグラウンド通知状態を定期的にチェックする関数
+void checkForegroundNotificationPeriodically(BuildContext context) {
+  Timer.periodic(Duration(seconds: 1), (timer) {
+    print('Foreground notification status: $comeForegroundNotification');
+
+    // 必要に応じてここで他の処理を追加します
+    if (comeForegroundNotification) {
+      print('Foreground notification detected.');
+      Navigator.of(context).pushNamed('/post');
+      comeForegroundNotification = false; // 遷移後にフラグをリセット
+    }
+  });
 }

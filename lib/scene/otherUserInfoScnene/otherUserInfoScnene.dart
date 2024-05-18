@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
+import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
@@ -12,6 +13,7 @@ class OtherUserInfoScene extends ConsumerWidget {
   OtherUserInfoScene({required this.userId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    checkForegroundNotificationPeriodically(context);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final otherUserData = ref.watch(otherUserDataProvider(userId));

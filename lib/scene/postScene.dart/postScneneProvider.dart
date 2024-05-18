@@ -106,6 +106,8 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
         .collection('usersPosts')
         .doc(cardId)
         .set(updatedPost.toJson());
+    await setUsersPostCardIdToFIrebaseDateUserPostCardIds(
+        ref, cardId, globalDate);
   } catch (e) {
     print('投稿エラー: $e');
   }
@@ -124,17 +126,15 @@ Future<void> setCountDownToProvider(WidgetRef ref) async {
 }
 
 Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
-  print('todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
   final UserData userData = ref.read(userDataProvider);
   final List<String> userPostCardIds = userData.userPostsCardIds;
 
-  bool alredayPosted = false;
+  bool didPostInLimit = false;
   int todayUserPostedCount = 0;
   for (var cardId in userPostCardIds) {
     final parts = cardId.split('_');
     final cardDate = parts[0];
     if (cardDate == globalDate) {
-      alredayPosted = true;
       final timeStr = parts[1];
       final formattedTime =
           "${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}:${timeStr.substring(4, 6)}";
@@ -143,22 +143,19 @@ Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
       final endDateTime = DateTime.parse(globalEndAt.toString());
       if (startDateTime.isBefore(cardDateTime) &&
           cardDateTime.isBefore(endDateTime)) {
-        todayUserPostedCount++;
+        didPostInLimit = true;
       }
+      todayUserPostedCount++;
     }
   }
-  if (!alredayPosted) {
-    print('alredayPosted: $alredayPosted');
-    ref.read(todayUserCanPostCountProvider.state).state = 1;
-    print(
-        'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
+  if (!didPostInLimit) {
+    ref.read(todayUserCanPostCountProvider.state).state =
+        1 - todayUserPostedCount;
   } else {
-    pragma('alredayPosted: $alredayPosted');
     ref.read(todayUserCanPostCountProvider.state).state =
         3 - todayUserPostedCount;
-    print(
-        'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
   }
   print(
       'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
+  print('todayUserPostedCount: $todayUserPostedCount');
 }

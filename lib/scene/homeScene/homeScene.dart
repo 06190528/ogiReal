@@ -4,6 +4,7 @@ import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/intialize.dart';
+import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
@@ -19,6 +20,7 @@ class HomeScene extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    checkForegroundNotificationPeriodically(context);
     initialize(ref, context);
     final userData = ref.watch(userDataProvider);
     final globalDateUsersPostCardIds =

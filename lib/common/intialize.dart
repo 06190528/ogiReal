@@ -134,4 +134,6 @@ Future<void> handleForegroundNotification(RemoteMessage message) async {
       payload: 'item x',
     );
   }
+  comeForegroundNotification = true;
+  print('comeForegroundNotification: $comeForegroundNotification');
 }

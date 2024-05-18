@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
+import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/countDownAppBarWidget.dart';
@@ -16,6 +17,7 @@ class PostScene extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final userTodayCanPostCount = ref.watch(todayUserCanPostCountProvider);
+    checkForegroundNotificationPeriodically(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await setCountDownToProvider(ref);
       setTodayUserCanPostCount(ref);
@@ -50,7 +52,7 @@ class PostScene extends ConsumerWidget {
                     if (ref.read(textControllerStateProvider).text.isEmpty ||
                         userTodayCanPostCount == 0) {
                       String toastText = 'テキストを入力してください';
-                      if (userTodayCanPostCount == 0) {
+                      if (userTodayCanPostCount <= 0) {
                         toastText = '本日の投稿回数が上限に達しました';
                       }
                       ToastWidget.showToast(toastText, width, height, context);

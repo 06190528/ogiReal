@@ -6,6 +6,11 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	&lt;key&gt;BGTaskSchedulerPermittedIdentifiers&lt;/key&gt;
+&lt;array&gt;
+    &lt;string&gt;com.yourcompany.yourapp.refresh&lt;/string&gt;
+    &lt;string&gt;com.yourcompany.yourapp.processing&lt;/string&gt;
+&lt;/array&gt;
 	<key>CFBundleDisplayName</key>
 	<string>大喜Real.</string>
 	<key>CFBundleExecutable</key>
