@@ -23,14 +23,16 @@ class HomeScene extends ConsumerWidget {
     checkForegroundNotificationPeriodically(context);
     initialize(ref, context);
     final userData = ref.watch(userDataProvider);
-    final globalDateUsersPostCardIds =
-        ref.watch(usersPostCardIdsMapProvider)[globalDate];
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final toolBarHeight = height * 0.08;
     final nowSelectSortType = ref.watch(nowSelectSortTypeProvider);
     getGlobalDateUsersPosts(ref, globalDate);
     setThemeToProviderFromFirebase(ref);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setNowShowPostsCardIds(ref, globalDate);
+    });
+    final nowShowPostCardIds = ref.watch(nowShowPostCardIdsProvider);
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
@@ -69,8 +71,8 @@ class HomeScene extends ConsumerWidget {
                       ),
                       textStyle: TextStyle(
                           color: themeColor,
-                          fontSize: adjustFontSize(
-                              sortType, width * 0.2, toolBarHeight * 0.5, 10))),
+                          fontSize: adjustFontSize(sortType, width * 0.2,
+                              toolBarHeight * 0.4 * 0.8, 10))),
               ],
             ),
             SizedBox(height: height * 0.01),
@@ -78,11 +80,11 @@ class HomeScene extends ConsumerWidget {
         ),
       ),
       body: Center(
-        child: globalDateUsersPostCardIds != null &&
-                globalDateUsersPostCardIds.isNotEmpty
+        child: nowShowPostCardIds != null && nowShowPostCardIds.isNotEmpty
             ? ListView.builder(
-                itemCount: globalDateUsersPostCardIds.length,
+                itemCount: nowShowPostCardIds.length,
                 itemBuilder: (BuildContext context, int index) {
+                  String cardId = nowShowPostCardIds[index];
                   return Container(
                     margin: EdgeInsets.only(
                         bottom: height * 0.01,
@@ -91,7 +93,7 @@ class HomeScene extends ConsumerWidget {
                     child: OgiriCard(
                       cardWidth: width * 0.8,
                       cardHeight: width * 0.8 * 0.6,
-                      cardId: globalDateUsersPostCardIds[index],
+                      cardId: cardId,
                       pushCardGoodButtonCallback: (
                         post,
                         isLiked,
@@ -121,7 +123,7 @@ class HomeScene extends ConsumerWidget {
       ),
       bottomNavigationBar: CommonBottomAppBar(
         ref: ref,
-        height: height * 0.08,
+        height: height * 0.8,
       ),
     );
   }

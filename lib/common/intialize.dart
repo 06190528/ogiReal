@@ -12,6 +12,7 @@ import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/main.dart';
+import 'package:ogireal_app/scene/eulaScene.dart';
 import 'package:ogireal_app/widget/settingWidget.dart';
 
 Future<void> initialize(WidgetRef ref, BuildContext context) async {
@@ -24,22 +25,33 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
         await UserDataService().fetchUserDataFromFirebase(userId);
     if (userData != null) {
       ref.read(userDataProvider.notifier).state = userData;
-    } else {
-      userData = ref.read(userDataProvider);
-      ref.read(userDataProvider.notifier).state =
-          ref.read(userDataProvider).copyWith(id: userId);
-      UserDataService().saveUserDataToFirebase(ref, 'id', userId);
-      if (userData != null && userData.name == null) {
+    }
+    userData = ref.read(userDataProvider);
+    ref.read(userDataProvider.notifier).state =
+        ref.read(userDataProvider).copyWith(id: userId);
+    UserDataService().saveUserDataToFirebase(ref, 'id', userId);
+    print('userData: $userData');
+
+    if (userData != null &&
+        (userData.name == null || userData.name == 'Anonymous')) {
+      print('userName: ${userData.name}');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EulaScreen(),
+        ),
+      ).then((_) {
         showDialog(
-            context: context,
-            builder: (context) {
-              return SettingAbstractWidget(
-                title: 'ユーザー名の登録',
-                explanation: 'ユーザー名を入力してください',
-                kind: 'name',
-              );
-            });
-      }
+          context: context,
+          builder: (context) {
+            return SettingAbstractWidget(
+              title: 'ユーザー名の登録',
+              explanation: 'ユーザー名を入力してください',
+              kind: 'name',
+            );
+          },
+        );
+      });
     }
     initializeMessaging();
   } catch (e) {

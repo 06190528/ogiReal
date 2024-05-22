@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/scene/homeScene/homeScene.dart';
-import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScene.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoScene.dart';
 
@@ -16,8 +15,10 @@ class CommonBottomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentRouteName = ModalRoute.of(context)?.settings.name;
+    double iconSize = height * 0.03;
     return BottomAppBar(
       color: themeColor,
+      height: height * 0.1,
       child: Container(
         height: height * 0.1,
         color: themeColor,
@@ -25,7 +26,11 @@ class CommonBottomAppBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: Icon(Icons.home, color: themeTextColor),
+              icon: Icon(
+                Icons.home,
+                color: themeTextColor,
+                size: iconSize,
+              ),
               onPressed: currentRouteName != HomeScene.routeName
                   ? () {
                       _navigateWithoutAnimation(
@@ -34,7 +39,7 @@ class CommonBottomAppBar extends StatelessWidget {
                   : null,
             ),
             IconButton(
-              icon: Icon(Icons.add_box, color: themeTextColor),
+              icon: Icon(Icons.add_box, color: themeTextColor, size: iconSize),
               onPressed: currentRouteName != PostScene.routeName
                   ? () {
                       _navigateWithoutAnimation(
@@ -43,7 +48,7 @@ class CommonBottomAppBar extends StatelessWidget {
                   : null,
             ),
             IconButton(
-              icon: Icon(Icons.person, color: themeTextColor),
+              icon: Icon(Icons.person, color: themeTextColor, size: iconSize),
               onPressed: currentRouteName != UserInfoScene.routeName
                   ? () {
                       _navigateWithoutAnimation(

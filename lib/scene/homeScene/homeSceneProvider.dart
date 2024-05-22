@@ -27,7 +27,7 @@ void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
   ref.read(targetPostProvider(post.cardId).notifier).state =
       post.copyWith(goodCount: targetCardGoodCount);
   UserDataService().saveUserDataToFirebase(ref, 'goodCardIds', goodCardIds);
-  changeTargetCardGood(ref, post, isLiked);
+  FirebaseFunction().changeTargetCardGood(ref, post, isLiked);
 }
 
 Future<void> sortGlobalDateUsersPostCardIds(
@@ -55,4 +55,20 @@ Future<void> sortGlobalDateUsersPostCardIds(
       break;
   }
   updateUsersPostCardIds(ref, globalDateUsersPostCardIds);
+}
+
+void setNowShowPostsCardIds(WidgetRef ref, String key) {
+  final userData = ref.read(userDataProvider);
+  final blockedUserIds = userData.blockedUserIds;
+  final globalDateUsersPostCardIds =
+      ref.watch(usersPostCardIdsMapProvider)[key];
+  List<String> nowShowPostsCardIds = [];
+  if (globalDateUsersPostCardIds == null) return;
+  for (String cardId in globalDateUsersPostCardIds) {
+    String userId = cardId.split('_')[2];
+    if (!blockedUserIds.contains(userId)) {
+      nowShowPostsCardIds.add(cardId);
+    }
+  }
+  ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostsCardIds;
 }

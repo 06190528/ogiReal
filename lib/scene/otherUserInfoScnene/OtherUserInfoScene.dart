@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/otherUserInfoScnene/OtherUserInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
 
@@ -29,10 +30,22 @@ class OtherUserInfoScene extends ConsumerWidget {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,
-              color: themeTextColor), // themeTextColor をアイコンの色として使用
+          icon: Icon(
+            Icons.arrow_back,
+            color: themeTextColor,
+            size: height * 0.5,
+          ), // themeTextColor をアイコンの色として使用
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu, color: themeTextColor, size: height * 0.5),
+            onPressed: () {
+              OtherUserInfoSceneProvider()
+                  .showHamburgerBottomSheet(context, ref, otherUserData);
+            },
+          ),
+        ],
       ),
       body: UserInfoWidget(
         width: width,
@@ -41,7 +54,7 @@ class OtherUserInfoScene extends ConsumerWidget {
       ),
       bottomNavigationBar: CommonBottomAppBar(
         ref: ref,
-        height: height * 0.8,
+        height: height,
       ),
     );
   }

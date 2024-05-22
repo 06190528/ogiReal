@@ -12,6 +12,7 @@ const defaultUserData = UserData(
   userPostsCardIds: [],
   follows: [],
   followers: [],
+  blockedUserIds: [],
   goodCardIds: [],
 );
 final userDataProvider = StateProvider<UserData>((ref) {
@@ -34,6 +35,10 @@ final targetPostProvider = StateProvider.family<Post, String>((ref, carId) {
 final otherUserDataProvider =
     StateProvider.family<UserData, String>((ref, userId) {
   return defaultUserData;
+});
+
+final nowShowPostCardIdsProvider = StateProvider<List<String>>((ref) {
+  return [];
 });
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

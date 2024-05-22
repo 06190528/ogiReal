@@ -106,7 +106,7 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
         .collection('usersPosts')
         .doc(cardId)
         .set(updatedPost.toJson());
-    await setUsersPostCardIdToFIrebaseDateUserPostCardIds(
+    await FirebaseFunction().setUsersPostCardIdToFIrebaseDateUserPostCardIds(
         ref, cardId, globalDate);
   } catch (e) {
     print('投稿エラー: $e');

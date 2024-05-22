@@ -4,8 +4,10 @@ import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/scene/otherUserInfoScnene/otherUserInfoScnene.dart';
+import 'package:ogireal_app/scene/otherUserInfoScnene/OtherUserInfoScene.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/widget/dialog/configureDialogWidget.dart';
+import 'package:ogireal_app/widget/toastWidget.dart';
 
 final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
@@ -37,7 +39,6 @@ class OgiriCard extends ConsumerWidget {
     String theme = post.theme;
     final textController = ref.watch(textControllerStateProvider);
     if (posting) {
-      //投稿シーンの時
       answer = '';
       theme = ref.watch(nowThemeProvider);
     }
@@ -50,7 +51,6 @@ class OgiriCard extends ConsumerWidget {
 
     return Card(
       color: Colors.white,
-      // elevation: 4.0,
       child: SizedBox(
         width: width,
         height: height,
@@ -127,7 +127,7 @@ class OgiriCard extends ConsumerWidget {
                               textState.copyWith(answer: value);
                         },
                         style: TextStyle(
-                          fontSize: height * 0.5 * 0.2,
+                          fontSize: height * 0.08,
                           color: Colors.black,
                         ),
                         decoration: InputDecoration(
@@ -145,7 +145,7 @@ class OgiriCard extends ConsumerWidget {
                         answer,
                         textAlign: TextAlign.center, // Text ウィジェットのテキストも中央揃えに
                         style: TextStyle(
-                          fontSize: height * 0.5 * 0.2,
+                          fontSize: height * 0.08,
                           color: Colors.black,
                         ),
                       ),
@@ -164,12 +164,31 @@ class OgiriCard extends ConsumerWidget {
                     color: Colors.black,
                   ),
                 ),
-                Spacer(), // ユーザー名を右端に押し出すために使用
+                SizedBox(width: width * 0.05),
+                IconButton(
+                  iconSize: height * 0.08,
+                  icon: const Icon(
+                    Icons.report_problem,
+                  ),
+                  onPressed: () {
+                    if (posting) return;
+                    ConfigureDialogWidget.showConfigureDialog(
+                      context: context,
+                      text: 'この投稿を通報しますか？',
+                      onConfirm: () async {
+                        ToastWidget.showToast(
+                            '通報しました。\nご協力ありがとうございます', width, height, context);
+                      },
+                    );
+                  },
+                ),
+                const Spacer(), // ユーザー名を右端に押し出すために使用
                 GestureDetector(
                   onTap: () async {
                     //コールバックで読んで
                     if (posting) return;
-                    await getTargetUserData(ref, post.userId);
+                    await FirebaseFunction()
+                        .getTargetUserData(ref, post.userId);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

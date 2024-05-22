@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
 
@@ -17,14 +18,23 @@ class UserInfoScene extends ConsumerWidget {
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(
-          backgroundColor: themeColor,
-          title: Text(
-            'ユーザ情報',
-            style: TextStyle(
-              color: themeTextColor,
-              fontSize: height * 0.025,
-            ),
-          )),
+        backgroundColor: themeColor,
+        title: Text(
+          'ユーザ情報',
+          style: TextStyle(
+            color: themeTextColor,
+            fontSize: height * 0.025,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu, color: themeTextColor),
+            onPressed: () {
+              showHamburgerBottomSheet(context, ref);
+            },
+          ),
+        ],
+      ),
       body: UserInfoWidget(
         width: width,
         height: height,

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_launcher_icons/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
@@ -48,7 +47,8 @@ Future<void> setTargetUserAllPosts(UserData userData, WidgetRef ref) async {
 
   for (var userPostCardId in userPostsCardIds) {
     if (ref.read(targetPostProvider(userPostCardId)) != defaultPost ||
-        await setTargetPostProviderFromFirebase(ref, userPostCardId)) {
+        await FirebaseFunction()
+            .setTargetPostProviderFromFirebase(ref, userPostCardId)) {
       //ここれがあるかないかでクラッシュする
       await setUsersPostCardIdToMapProvider(ref, userPostCardId, userId);
     }
@@ -78,8 +78,6 @@ void updateUsersPostCardIds(WidgetRef ref, List<String> newCardIds) {
 // フォアグラウンド通知状態を定期的にチェックする関数
 void checkForegroundNotificationPeriodically(BuildContext context) {
   Timer.periodic(Duration(seconds: 1), (timer) {
-    print('Foreground notification status: $comeForegroundNotification');
-
     // 必要に応じてここで他の処理を追加します
     if (comeForegroundNotification) {
       print('Foreground notification detected.');

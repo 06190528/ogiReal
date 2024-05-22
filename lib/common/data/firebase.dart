@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
-import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
@@ -16,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserDataService {
   String generateUniqueUserID() {
     var random = Random();
-    int randomNumber = random.nextInt(1000); // 例: 0から999まで
+    int randomNumber = random.nextInt(1000);
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyyMMddHHmmss').format(now);
     String uniqueUserID = "${formattedDate}${randomNumber}";
@@ -74,6 +73,17 @@ class UserDataService {
           ref.read(userDataProvider.notifier).state =
               userData.copyWith(followers: value);
           break;
+        case 'blockedUserIds':
+          List<String> blockedUserIds =
+              List<String>.from(userData.blockedUserIds);
+          if (blockedUserIds.contains(value)) {
+            blockedUserIds.remove(value);
+          } else {
+            blockedUserIds.add(value);
+          }
+          ref.read(userDataProvider.notifier).state =
+              userData.copyWith(blockedUserIds: blockedUserIds);
+          break;
         case 'goodCardIds':
           ref.read(userDataProvider.notifier).state =
               userData.copyWith(goodCardIds: value);
@@ -114,12 +124,14 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
     if (globalDateUsersPostsCardIdsMap == null) {
       loadingUserPosts = true;
       //まだusersPostCardIdsMapProviderのglobalDateが存在しない時の処理
-      await getDateUserPostCardIdsFromFirebase(ref, globalDate);
+      await FirebaseFunction()
+          .getDateUserPostCardIdsFromFirebase(ref, globalDate);
       final List<String>? globalDateUsersPostsCardIdsMap =
           ref.read(usersPostCardIdsMapProvider)[globalDate];
       if (globalDateUsersPostsCardIdsMap != null) {
         for (var cardId in globalDateUsersPostsCardIdsMap) {
-          await setTargetPostProviderFromFirebase(ref, cardId);
+          await FirebaseFunction()
+              .setTargetPostProviderFromFirebase(ref, cardId);
         }
       }
       loadingUserPosts = false;
@@ -136,93 +148,122 @@ Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
   }
 }
 
+class FirebaseFunction {
 //user'sPostsのtargetCardIdをのgoodCountを更新
-Future<void> changeTargetCardGood(
-    WidgetRef ref, Post targetUserPost, bool isLiked) async {
-  String targetCardId = targetUserPost.cardId;
-  final userId = ref.read(userDataProvider).id;
-  if (userId == null) return;
+  Future<void> changeTargetCardGood(
+      WidgetRef ref, Post targetUserPost, bool isLiked) async {
+    String targetCardId = targetUserPost.cardId;
+    final userId = ref.read(userDataProvider).id;
+    if (userId == null) return;
 
-  DocumentReference targetCardDocRef =
-      FirebaseFirestore.instance.collection('usersPosts').doc(targetCardId);
-  int incrementValue = isLiked ? -1 : 1;
-  await targetCardDocRef
-      .update({'goodCount': FieldValue.increment(incrementValue)});
-}
+    DocumentReference targetCardDocRef =
+        FirebaseFirestore.instance.collection('usersPosts').doc(targetCardId);
+    int incrementValue = isLiked ? -1 : 1;
+    await targetCardDocRef
+        .update({'goodCount': FieldValue.increment(incrementValue)});
+  }
 
 //firebaseから大喜利カードを取ってくれる
-Future<bool> setTargetPostProviderFromFirebase(
-    WidgetRef ref, String cardId) async {
-  if (ref.read(targetPostProvider(cardId)) != defaultPost) {
-    return false;
+  Future<bool> setTargetPostProviderFromFirebase(
+      WidgetRef ref, String cardId) async {
+    if (ref.read(targetPostProvider(cardId)) != defaultPost) {
+      return false;
+    }
+    ;
+    final doc = await FirebaseFirestore.instance
+        .collection('usersPosts')
+        .doc(cardId)
+        .get();
+    if (!doc.exists) return false;
+    final post = Post.fromJson(doc.data() as Map<String, dynamic>);
+    ref.read(targetPostProvider(cardId).notifier).update((state) => post);
+    return true;
   }
-  ;
-  final doc = await FirebaseFirestore.instance
-      .collection('usersPosts')
-      .doc(cardId)
-      .get();
-  if (!doc.exists) return false;
-  final post = Post.fromJson(doc.data() as Map<String, dynamic>);
-  ref.read(targetPostProvider(cardId).notifier).update((state) => post);
-  return true;
-}
 
-Future<void> getTargetUserData(WidgetRef ref, String targetUserId) async {
-  if (ref.read(otherUserDataProvider(targetUserId)) != defaultUserData) {
-    return ref.read(otherUserDataProvider(targetUserId));
+  Future<void> getTargetUserData(WidgetRef ref, String targetUserId) async {
+    if (ref.read(otherUserDataProvider(targetUserId)) != defaultUserData) {
+      return ref.read(otherUserDataProvider(targetUserId));
+    }
+    UserData targetUserData = defaultUserData;
+    try {
+      targetUserData =
+          await UserDataService().fetchUserDataFromFirebase(targetUserId) ??
+              defaultUserData;
+      ref.read(otherUserDataProvider(targetUserId).notifier).state =
+          targetUserData;
+    } catch (e) {
+      print('Error fetching target user data: $e');
+    }
   }
-  UserData targetUserData = defaultUserData;
-  try {
-    targetUserData =
-        await UserDataService().fetchUserDataFromFirebase(targetUserId) ??
-            defaultUserData;
-    ref.read(otherUserDataProvider(targetUserId).notifier).state =
-        targetUserData;
-  } catch (e) {
-    print('Error fetching target user data: $e');
-  }
-}
 
-Future<void> setUserCardIdToFirebaseDateUserPostCardIds(
-    String date, String cardId) async {
-  final docRef =
-      FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
+  Future<void> setUserCardIdToFirebaseDateUserPostCardIds(
+      String date, String cardId) async {
+    final docRef =
+        FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
 
-  // Firestore ドキュメントに cardId を追加
-  await docRef.update({
-    'cardIds': FieldValue.arrayUnion([cardId])
-  }).catchError((error) {
-    return docRef.set({
-      'cardIds': [cardId]
+    // Firestore ドキュメントに cardId を追加
+    await docRef.update({
+      'cardIds': FieldValue.arrayUnion([cardId])
+    }).catchError((error) {
+      return docRef.set({
+        'cardIds': [cardId]
+      });
     });
-  });
-}
-
-Future<void> getDateUserPostCardIdsFromFirebase(
-    WidgetRef ref, String date) async {
-  final docRef =
-      FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
-  final doc = await docRef.get();
-  if (doc.exists) {
-    final data = doc.data() as Map<String, dynamic>;
-    final cardIds = data['cardIds'] as List<dynamic>? ?? []; // nullチェックを追加
-    ref.read(usersPostCardIdsMapProvider.state).state[date] =
-        cardIds.map((e) => e.toString()).toList();
-  } else {
-    ref.read(usersPostCardIdsMapProvider.state).state[date] =
-        []; // ドキュメントが存在しない場合
   }
-}
 
-Future<void> setUsersPostCardIdToFIrebaseDateUserPostCardIds(
-    WidgetRef ref, String cardId, String date) async {
-  final docRef =
-      FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
-  await docRef.update({
-    'cardIds': FieldValue.arrayUnion([cardId])
-  }).catchError((error) {
-    return docRef.set({
-      'cardIds': [cardId]
+  Future<void> getDateUserPostCardIdsFromFirebase(
+      WidgetRef ref, String date) async {
+    final docRef =
+        FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
+    final doc = await docRef.get();
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      final cardIds = data['cardIds'] as List<dynamic>? ?? []; // nullチェックを追加
+      ref.read(usersPostCardIdsMapProvider.state).state[date] =
+          cardIds.map((e) => e.toString()).toList();
+    } else {
+      ref.read(usersPostCardIdsMapProvider.state).state[date] =
+          []; // ドキュメントが存在しない場合
+    }
+  }
+
+  Future<void> setUsersPostCardIdToFIrebaseDateUserPostCardIds(
+      WidgetRef ref, String cardId, String date) async {
+    final docRef =
+        FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
+    await docRef.update({
+      'cardIds': FieldValue.arrayUnion([cardId])
+    }).catchError((error) {
+      return docRef.set({
+        'cardIds': [cardId]
+      });
     });
-  });
+  }
+
+  Future<void> deleteUserDataAndUserPosts(WidgetRef ref) async {
+    final userId = ref.read(userDataProvider).id;
+    final userPostsCardIds = ref.read(userDataProvider).userPostsCardIds;
+    if (userId == null) return;
+    await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+    await FirebaseFirestore.instance
+        .collection('usersPosts')
+        .where('userId', isEqualTo: userId)
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    // ユーザーが投稿したカードを削除
+    for (String cardId in userPostsCardIds) {
+      String date = cardId.split('_')[0];
+      await FirebaseFirestore.instance
+          .collection('dateUserPostCardIds')
+          .doc(date)
+          .update({
+        'cardIds': FieldValue.arrayRemove([cardId])
+      });
+    }
+  }
 }

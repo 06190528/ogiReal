@@ -27,6 +27,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Your App',
+      debugShowCheckedModeBanner: false, // ここを追加
       initialRoute: HomeScene.routeName, // 初期ルートを指定
       routes: {
         HomeScene.routeName: (context) => HomeScene(), // ホーム画面
