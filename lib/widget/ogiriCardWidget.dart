@@ -15,14 +15,12 @@ final textControllerStateProvider =
 
 class OgiriCard extends ConsumerWidget {
   final double? cardWidth;
-  final double? cardHeight;
   final String? cardId;
   final Function(Post post, bool isLiked)? pushCardGoodButtonCallback;
 
   OgiriCard({
     super.key,
     required this.cardWidth,
-    required this.cardHeight,
     required this.cardId,
     required this.pushCardGoodButtonCallback,
   });
@@ -43,17 +41,17 @@ class OgiriCard extends ConsumerWidget {
       theme = ref.watch(nowThemeProvider);
     }
     final width = cardWidth ?? 0;
-    final height = cardHeight ?? 0;
+    final height = width * 0.6;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       textController.text = answer ?? "";
     });
 
-    return Card(
-      color: Colors.white,
-      child: SizedBox(
-        width: width,
-        height: height,
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Card(
+        color: Color.fromARGB(255, 255, 255, 255),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

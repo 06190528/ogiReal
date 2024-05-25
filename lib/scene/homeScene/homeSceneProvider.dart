@@ -9,6 +9,9 @@ import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
 final ogiriCardsProvider = StateProvider<List<OgiriCard>>((ref) => []);
 final nowSelectSortTypeProvider = StateProvider<String>((ref) => sortTypes[0]);
+final selectedDayProvider = StateProvider<DateTime?>((ref) {
+  return null;
+});
 bool loadingUserPosts = false;
 
 void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
@@ -30,34 +33,34 @@ void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
   FirebaseFunction().changeTargetCardGood(ref, post, isLiked);
 }
 
-Future<void> sortGlobalDateUsersPostCardIds(
-    WidgetRef ref, String SortType) async {
-  List<String>? globalDateUsersPostCardIds =
-      ref.watch(usersPostCardIdsMapProvider)[globalDate];
-  if (globalDateUsersPostCardIds == null) return;
+Future<void> sortNowShowPostCardIds(WidgetRef ref, String SortType) async {
+  //コピーする
+  List<String>? nowShowPostCardIds =
+      List<String>.from(ref.read(nowShowPostCardIdsProvider));
+  if (nowShowPostCardIds == null) return;
   switch (SortType) {
     case '新着':
-      globalDateUsersPostCardIds.sort((a, b) => b.compareTo(a));
-      ref.read(usersPostCardIdsMapProvider.notifier).state[globalDate] =
-          globalDateUsersPostCardIds;
+      nowShowPostCardIds.sort((a, b) => b.compareTo(a));
+      ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostCardIds;
       break;
     case 'ランキング':
       List<Post> posts = [];
-      for (String cardId in globalDateUsersPostCardIds) {
+      for (String cardId in nowShowPostCardIds) {
         Post post = ref.read(targetPostProvider(cardId));
         posts.add(post);
       }
       posts.sort((a, b) => b.goodCount.compareTo(a.goodCount));
       List<String> sortedCardIds = posts.map((post) => post.cardId).toList();
-      globalDateUsersPostCardIds = sortedCardIds;
+      nowShowPostCardIds = sortedCardIds;
     default:
-      globalDateUsersPostCardIds.sort((a, b) => b.compareTo(a));
+      nowShowPostCardIds.sort((a, b) => b.compareTo(a));
       break;
   }
-  updateUsersPostCardIds(ref, globalDateUsersPostCardIds);
+  ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostCardIds;
 }
 
-void setNowShowPostsCardIds(WidgetRef ref, String key) {
+Future<void> setNowShowPostsCardIds(WidgetRef ref, String key) async {
+  // if (ref.read(nowShowPostCardIdsProvider) != []) return;
   final userData = ref.read(userDataProvider);
   final blockedUserIds = userData.blockedUserIds;
   final globalDateUsersPostCardIds =
@@ -71,4 +74,10 @@ void setNowShowPostsCardIds(WidgetRef ref, String key) {
     }
   }
   ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostsCardIds;
+}
+
+void changeSelectedDay(WidgetRef ref, DateTime selectedDay) async {
+  ref.read(nowSelectSortTypeProvider.state).state = sortTypes[0];
+  await getSpecificDateUsersPosts(ref, selectedDay.toString());
+  await sortNowShowPostCardIds(ref, sortTypes[0]);
 }

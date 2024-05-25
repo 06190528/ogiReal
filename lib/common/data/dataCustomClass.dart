@@ -29,7 +29,7 @@ class AbstractUserData {
 class GlobalData {
   static final GlobalData _instance = GlobalData._internal();
 
-  String todayDate; // late finalを削除し、デフォルト値を設定するかnull許容型にする
+  DateTime todayDate;
   DateTime startAt;
   DateTime endAt;
 
@@ -38,9 +38,9 @@ class GlobalData {
   }
 
   GlobalData._internal()
-      : todayDate = '', // デフォルトの値を設定
-        startAt = DateTime.now(), // デフォルトの値を設定
-        endAt = DateTime.now(); // デフォルトの値を設定
+      : todayDate = DateTime.now(),
+        startAt = DateTime.now(),
+        endAt = DateTime.now();
 
   Future<void> initializeTodayDate() async {
     var todayDateDoc = await FirebaseFirestore.instance
@@ -48,21 +48,55 @@ class GlobalData {
         .doc('todayDate')
         .get();
 
-    // 文字列をDateTimeに変換
-    todayDate = todayDateDoc.data()?['todayDate'] as String;
-    DateTime startAt1 =
-        DateFormat("HH:mm").parse(todayDateDoc.data()?['start_at'] as String);
-    DateTime endAt1 =
-        DateFormat("HH:mm").parse(todayDateDoc.data()?['end_at'] as String);
+    if (todayDateDoc.exists) {
+      // Firestoreから取得したデータをDateTimeに変換
+      String? todayDateString = todayDateDoc.data()?['todayDate'] as String?;
+      if (todayDateString != null) {
+        print('todayDateString: $todayDateString'); // デバッグ用(日付の確認)
+        try {
+          DateTime parsedTodayDate =
+              DateFormat('yyyyMMdd').parse(todayDateString);
+          todayDate = DateTime(
+              parsedTodayDate.year, parsedTodayDate.month, parsedTodayDate.day);
+        } catch (e) {
+          print('Error parsing todayDate: $e');
+        }
+      }
 
-    // 現在の日付を使って時刻のみのDateTimeに日付情報を追加
-    DateTime now = DateTime.now();
-    startAt =
-        DateTime(now.year, now.month, now.day, startAt1.hour, startAt1.minute);
-    endAt = DateTime(now.year, now.month, now.day, endAt1.hour, endAt1.minute);
+      String? startAtString = todayDateDoc.data()?['start_at'] as String?;
+      if (startAtString != null) {
+        print('startAtString: $startAtString'); // デバッグ用(開始時刻の確認)
+        try {
+          DateTime startAt1 = DateFormat('HH:mm').parse(startAtString);
+          DateTime now = DateTime.now();
+          startAt = DateTime(
+              now.year, now.month, now.day, startAt1.hour, startAt1.minute);
+        } catch (e) {
+          print('Error parsing startAt: $e');
+        }
+      }
+
+      String? endAtString = todayDateDoc.data()?['end_at'] as String?;
+      if (endAtString != null) {
+        print('endAtString: $endAtString'); // デバッグ用(終了時刻の確認)
+        try {
+          DateTime endAt1 = DateFormat('HH:mm').parse(endAtString);
+          DateTime now = DateTime.now();
+          endAt = DateTime(
+              now.year, now.month, now.day, endAt1.hour, endAt1.minute);
+        } catch (e) {
+          print('Error parsing endAt: $e');
+        }
+      }
+    } else {
+      print('Document does not exist');
+    }
   }
 }
 
-String get globalDate => GlobalData().todayDate;
+// globalDateをDateTime型として取得するためのゲッター
+String get globalDateString =>
+    DateFormat('yyyyMMdd').format(GlobalData().todayDate);
+DateTime get globalDate => GlobalData().todayDate;
 DateTime get globalStartAt => GlobalData().startAt;
 DateTime get globalEndAt => GlobalData().endAt;

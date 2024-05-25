@@ -7,6 +7,7 @@ import 'package:ogireal_app/common/intialize.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
+import 'package:ogireal_app/scene/homeScene/widget/carenderWidget.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
@@ -27,10 +28,10 @@ class HomeScene extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     final toolBarHeight = height * 0.08;
     final nowSelectSortType = ref.watch(nowSelectSortTypeProvider);
-    getGlobalDateUsersPosts(ref, globalDate);
+    getSpecificDateUsersPosts(ref, globalDateString);
     setThemeToProviderFromFirebase(ref);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setNowShowPostsCardIds(ref, globalDate);
+      setNowShowPostsCardIds(ref, globalDateString);
     });
     final nowShowPostCardIds = ref.watch(nowShowPostCardIdsProvider);
     return Scaffold(
@@ -40,10 +41,36 @@ class HomeScene extends ConsumerWidget {
         toolbarHeight: toolBarHeight,
         title: Column(
           children: [
-            Text(
-              '大喜Real.',
-              style: TextStyle(
-                  color: themeTextColor, fontSize: toolBarHeight * 0.4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(width: width * 0.08), // 左端の余白とバランスを取るために追加
+                Center(
+                  child: Text(
+                    '大喜Real.',
+                    style: TextStyle(
+                      color: themeTextColor,
+                      fontSize: toolBarHeight * 0.4,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.calendar_today,
+                    color: themeTextColor,
+                    size: toolBarHeight * 0.3,
+                  ),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return CalendarWidget();
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
             SizedBox(height: height * 0.01),
             Row(
@@ -55,7 +82,7 @@ class HomeScene extends ConsumerWidget {
                       width: width * 0.3,
                       height: toolBarHeight * 0.4,
                       onPressed: () {
-                        sortGlobalDateUsersPostCardIds(ref, sortType);
+                        sortNowShowPostCardIds(ref, sortType);
                         ref.read(nowSelectSortTypeProvider.state).state =
                             sortType;
                       },
@@ -80,32 +107,41 @@ class HomeScene extends ConsumerWidget {
         ),
       ),
       body: Center(
-        child: nowShowPostCardIds != null && nowShowPostCardIds.isNotEmpty
-            ? ListView.builder(
-                itemCount: nowShowPostCardIds.length,
-                itemBuilder: (BuildContext context, int index) {
-                  String cardId = nowShowPostCardIds[index];
-                  return Container(
-                    margin: EdgeInsets.only(
-                        bottom: height * 0.01,
-                        left: width * 0.05,
-                        right: width * 0.05),
-                    child: OgiriCard(
-                      cardWidth: width * 0.8,
-                      cardHeight: width * 0.8 * 0.6,
-                      cardId: cardId,
-                      pushCardGoodButtonCallback: (
-                        post,
-                        isLiked,
-                      ) {
-                        if (post.userId == userData.id) {
-                          ToastWidget.showToast(
-                              '自分の投稿にはいいねできません', width, height, context);
-                          return;
-                        }
-                        pushCardGoodButton(ref, post, isLiked);
-                      },
+        child: nowShowPostCardIds.isNotEmpty
+            ? LayoutBuilder(
+                builder: (context, constraints) {
+                  int crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+                  double cardWidth = (width * 0.8) / crossAxisCount;
+                  return GridView.builder(
+                    itemCount: nowShowPostCardIds.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      childAspectRatio: 2,
                     ),
+                    itemBuilder: (BuildContext context, int index) {
+                      String cardId = nowShowPostCardIds[index];
+                      return Container(
+                        color: themeColor,
+                        width: cardWidth,
+                        margin: EdgeInsets.only(
+                            left: width * 0.01, right: width * 0.01),
+                        child: OgiriCard(
+                          cardWidth: cardWidth,
+                          cardId: cardId,
+                          pushCardGoodButtonCallback: (
+                            post,
+                            isLiked,
+                          ) {
+                            if (post.userId == userData.id) {
+                              ToastWidget.showToast(
+                                  '自分の投稿にはいいねできません', width, height, context);
+                              return;
+                            }
+                            pushCardGoodButton(ref, post, isLiked);
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
               )

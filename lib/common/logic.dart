@@ -68,13 +68,6 @@ Future<void> setUsersPostCardIdToMapProvider(
   ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;
 }
 
-void updateUsersPostCardIds(WidgetRef ref, List<String> newCardIds) {
-  Map<String, List<String>> currentMap =
-      Map.from(ref.read(usersPostCardIdsMapProvider));
-  currentMap[globalDate] = newCardIds;
-  ref.read(usersPostCardIdsMapProvider.notifier).state = currentMap;
-}
-
 // フォアグラウンド通知状態を定期的にチェックする関数
 void checkForegroundNotificationPeriodically(BuildContext context) {
   Timer.periodic(Duration(seconds: 1), (timer) {

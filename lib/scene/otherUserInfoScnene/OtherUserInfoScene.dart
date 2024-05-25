@@ -33,13 +33,17 @@ class OtherUserInfoScene extends ConsumerWidget {
           icon: Icon(
             Icons.arrow_back,
             color: themeTextColor,
-            size: height * 0.5,
-          ), // themeTextColor をアイコンの色として使用
+            size: height * 0.03, // サイズを調整
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.menu, color: themeTextColor, size: height * 0.5),
+            icon: Icon(
+              Icons.menu,
+              color: themeTextColor,
+              size: height * 0.03, // サイズを調整
+            ),
             onPressed: () {
               OtherUserInfoSceneProvider()
                   .showHamburgerBottomSheet(context, ref, otherUserData);

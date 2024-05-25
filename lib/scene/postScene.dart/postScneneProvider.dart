@@ -79,7 +79,7 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
     return;
   }
 
-  final String cardId = globalDate +
+  final String cardId = globalDateString +
       '_' +
       DateFormat('HHmmss').format(DateTime.now()) +
       "_" + // スラッシュをアンダースコアに置き換えました
@@ -88,7 +88,7 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
   Post updatedPost = post.copyWith(
     userName: userName,
     userId: userId,
-    date: globalDate,
+    date: globalDateString,
     theme: ref.read(nowThemeProvider),
     goodCount: 0,
     cardId: cardId,
@@ -107,7 +107,7 @@ Future<void> createAndSavePostCardToFirebase(WidgetRef ref) async {
         .doc(cardId)
         .set(updatedPost.toJson());
     await FirebaseFunction().setUsersPostCardIdToFIrebaseDateUserPostCardIds(
-        ref, cardId, globalDate);
+        ref, cardId, globalDateString);
   } catch (e) {
     print('投稿エラー: $e');
   }
@@ -134,7 +134,7 @@ Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
   for (var cardId in userPostCardIds) {
     final parts = cardId.split('_');
     final cardDate = parts[0];
-    if (cardDate == globalDate) {
+    if (cardDate == globalDateString) {
       final timeStr = parts[1];
       final formattedTime =
           "${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}:${timeStr.substring(4, 6)}";

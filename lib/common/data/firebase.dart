@@ -103,7 +103,7 @@ Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
   if (ref.read(nowThemeProvider) == 'default') {
     DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
         .collection('theme')
-        .doc(globalDate)
+        .doc(globalDateString)
         .get();
     if (themeDocRef.exists && themeDocRef.data() != null) {
       Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
@@ -117,7 +117,7 @@ Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
 
 //新しいusersPostCardIdsMapProviderを作成し同じでなければ代入して変更を通知
 //firebaseから同じものは取らないようにする.
-Future<void> getGlobalDateUsersPosts(WidgetRef ref, String globalDate) async {
+Future<void> getSpecificDateUsersPosts(WidgetRef ref, String globalDate) async {
   try {
     final List<String>? globalDateUsersPostsCardIdsMap =
         ref.read(usersPostCardIdsMapProvider)[globalDate];

@@ -38,7 +38,6 @@ class PostScene extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start, // コンテンツを上に寄せる
             children: [
               OgiriCard(
-                cardHeight: height * 0.22,
                 cardWidth: width * 0.8,
                 cardId: null,
                 pushCardGoodButtonCallback: null,

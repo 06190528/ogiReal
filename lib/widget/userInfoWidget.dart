@@ -68,7 +68,6 @@ class UserInfoWidget extends ConsumerWidget {
                       right: width * 0.05),
                   child: OgiriCard(
                     cardWidth: width * 0.8,
-                    cardHeight: width * 0.8 * 0.6,
                     cardId: usersPostCardIds[index],
                     pushCardGoodButtonCallback:
                         null, // Implement callback if needed

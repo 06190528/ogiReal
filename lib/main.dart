@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/firebase_options.dart';
 import 'package:ogireal_app/scene/homeScene/homeScene.dart';
@@ -14,6 +15,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  MobileAds.instance.initialize();
   await GlobalData().initializeTodayDate(); // グローバルデータの初期化
   runApp(
     ProviderScope(

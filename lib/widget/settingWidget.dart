@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
+import 'package:ogireal_app/widget/toastWidget.dart';
 
 class SettingAbstractWidget extends ConsumerStatefulWidget {
   final String title;
@@ -24,17 +25,21 @@ class _SettingAbstractWidgetState extends ConsumerState<SettingAbstractWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: themeColor,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: themeTextColor),
+          icon: Icon(Icons.arrow_back,
+              color: themeTextColor, size: height * 0.03),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(widget.title, style: TextStyle(color: themeTextColor)),
+        title: Text(widget.title,
+            style: TextStyle(color: themeTextColor, fontSize: height * 0.02)),
         actions: [
           IconButton(
-            icon: Icon(Icons.check, color: themeTextColor),
+            icon: Icon(Icons.check, color: themeTextColor, size: height * 0.03),
             onPressed: () async {
               if (_controller.text.isNotEmpty) {
                 await UserDataService().saveUserDataToFirebase(
@@ -43,6 +48,8 @@ class _SettingAbstractWidgetState extends ConsumerState<SettingAbstractWidget> {
                   _controller.text,
                 );
                 Navigator.of(context).pop();
+              } else {
+                ToastWidget.showToast('ユーザー名を入力して下さい', width, height, context);
               }
             },
           ),
@@ -67,7 +74,7 @@ class _SettingAbstractWidgetState extends ConsumerState<SettingAbstractWidget> {
                 hintStyle: TextStyle(color: themeTextColor.withOpacity(0.6)),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             Text(
               widget.explanation,
               style: TextStyle(color: themeTextColor),

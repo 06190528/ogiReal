@@ -21,7 +21,7 @@ class ToastWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: width * 0.05,
+                fontSize: width * 0.03,
                 color: Colors.blue,
               ),
             ),

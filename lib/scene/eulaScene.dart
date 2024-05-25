@@ -26,7 +26,7 @@ class EulaScreen extends StatelessWidget {
             ),
             Center(
               child: Container(
-                height: height * 0.1,
+                height: height * 0.07,
                 child: ElevatedButton(
                   onPressed: () async {
                     final prefs = await SharedPreferences.getInstance();
