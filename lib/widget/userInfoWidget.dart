@@ -1,11 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
-import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
@@ -23,7 +21,8 @@ class UserInfoWidget extends ConsumerWidget {
         ref.watch(usersPostCardIdsMapProvider)[userData.id] ?? [];
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (userData.id == ref.read(userDataProvider).id) {
-        await setTargetUserAllPosts(userData, ref); //こいつさえいなければクラッシュしない
+        await setTargetUserAllPosts(
+            userData, ref, width, height, context); //こいつさえいなければクラッシュしない
       }
     });
 
@@ -67,10 +66,15 @@ class UserInfoWidget extends ConsumerWidget {
                       left: width * 0.05,
                       right: width * 0.05),
                   child: OgiriCard(
-                    cardWidth: width * 0.8,
+                    cardWidth: width * 0.9,
                     cardId: usersPostCardIds[index],
-                    pushCardGoodButtonCallback:
-                        null, // Implement callback if needed
+                    pushCardGoodButtonCallback: (post, isLiked) {
+                      if (post.userId == ref.read(userDataProvider).id) {
+                        return;
+                      }
+                      pushCardGoodButton(
+                          ref, post, isLiked, width, height, context);
+                    },
                   ));
             },
           ),

@@ -14,7 +14,7 @@ class UserInfoScene extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final userData = ref.watch(userDataProvider);
-    checkForegroundNotificationPeriodically(context);
+    checkForegroundNotificationPeriodically(ref, context);
     return Scaffold(
       backgroundColor: themeColor,
       appBar: AppBar(

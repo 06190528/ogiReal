@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
-import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
-import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 
 void navigateAndRemoveUntil(
     BuildContext context, Widget targetPage, String targetRouteName) {
@@ -27,33 +25,11 @@ bool canGoNextScene(WidgetRef ref) {
     //usersPosts設定されているkeyのvalueがあるかどうか確認しないとあかん
     canGo = true;
   }
-  print('userData: $userData');
-  print('theme: $theme');
-  print('loadingUserPosts: $loadingUserPosts');
-  print('canGo: $canGo');
+  // print('userData: $userData');
+  // print('theme: $theme');
+  // print('loadingUserPosts: $loadingUserPosts');
+  // print('canGo: $canGo');
   return canGo;
-}
-
-Future<void> setTargetUserAllPosts(UserData userData, WidgetRef ref) async {
-  final userId = ref.read(userDataProvider).id;
-  final List<String> userPostsCardIds = userData.userPostsCardIds;
-  Map<String, List<String>> usersPostCardIdsMap =
-      ref.read(usersPostCardIdsMapProvider); // 現在の状態を読み取る
-
-  if (userId == null) return;
-  if (usersPostCardIdsMap[userId] != null) {
-    if (usersPostCardIdsMap[userId]!.isNotEmpty) return;
-  }
-
-  for (var userPostCardId in userPostsCardIds) {
-    if (ref.read(targetPostProvider(userPostCardId)) != defaultPost ||
-        await FirebaseFunction()
-            .setTargetPostProviderFromFirebase(ref, userPostCardId)) {
-      //ここれがあるかないかでクラッシュする
-      await setUsersPostCardIdToMapProvider(ref, userPostCardId, userId);
-    }
-  }
-  await Future.delayed(Duration(seconds: 5));
 }
 
 Future<void> setUsersPostCardIdToMapProvider(
@@ -69,13 +45,18 @@ Future<void> setUsersPostCardIdToMapProvider(
 }
 
 // フォアグラウンド通知状態を定期的にチェックする関数
-void checkForegroundNotificationPeriodically(BuildContext context) {
-  Timer.periodic(Duration(seconds: 1), (timer) {
-    // 必要に応じてここで他の処理を追加します
-    if (comeForegroundNotification) {
-      print('Foreground notification detected.');
+Future<void> checkForegroundNotificationPeriodically(
+    WidgetRef ref, BuildContext context) async {
+  Timer.periodic(Duration(seconds: 1), (timer) async {
+    if (Common.comeForegroundNotification) {
       Navigator.of(context).pushNamed('/post');
-      comeForegroundNotification = false; // 遷移後にフラグをリセット
+      ref.read(nowThemeProvider.state).state = 'default';
+      await GlobalData().initializeTodayDate(); // グローバルデータの初期化
+      await setThemeToProviderFromFirebase(ref);
+      await FirebaseFunction()
+          .getDateUserPostCardIdsFromFirebase(ref, globalDateString);
+      await setNowShowPostsCardIds(ref, globalDateString, false);
+      Common.comeForegroundNotification = false; // 遷移後にフラグをリセット
     }
   });
 }

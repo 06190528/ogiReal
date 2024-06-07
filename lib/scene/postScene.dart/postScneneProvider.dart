@@ -155,7 +155,4 @@ Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
     ref.read(todayUserCanPostCountProvider.state).state =
         3 - todayUserPostedCount;
   }
-  print(
-      'Updated todayUserCanPostCount: ${ref.read(todayUserCanPostCountProvider)}');
-  print('todayUserPostedCount: $todayUserPostedCount');
 }

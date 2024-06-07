@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io' as io;
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:google_api_availability/google_api_availability.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/main.dart';
 import 'package:ogireal_app/scene/eulaScene.dart';
 import 'package:ogireal_app/widget/settingWidget.dart';
 
@@ -30,11 +28,9 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
     ref.read(userDataProvider.notifier).state =
         ref.read(userDataProvider).copyWith(id: userId);
     UserDataService().saveUserDataToFirebase(ref, 'id', userId);
-    print('userData: $userData');
 
     if (userData != null &&
         (userData.name == null || userData.name == 'Anonymous')) {
-      print('userName: ${userData.name}');
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -60,13 +56,14 @@ Future<void> initialize(WidgetRef ref, BuildContext context) async {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  main();
+  print('Handling a background message: ${message.messageId}');
+  handleForegroundNotification(message);
 }
 
 Future<void> initializeMessaging() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   final String? fcmToken = await FirebaseMessaging.instance.getToken();
-  print("FCM Token: $fcmToken");
+  print('FCM Token: $fcmToken');
 
   // プラットフォームがAndroidかつWebではない場合、Google Play Servicesのチェック
   if (!kIsWeb && io.Platform.isAndroid) {
@@ -146,6 +143,5 @@ Future<void> handleForegroundNotification(RemoteMessage message) async {
       payload: 'item x',
     );
   }
-  comeForegroundNotification = true;
-  print('comeForegroundNotification: $comeForegroundNotification');
+  Common.comeForegroundNotification = true;
 }

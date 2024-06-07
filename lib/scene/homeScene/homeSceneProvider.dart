@@ -1,21 +1,32 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
+import 'package:ogireal_app/common/intialize.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
-import 'package:ogireal_app/widget/ogiriCardWidget.dart';
+import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/widget/toastWidget.dart';
 
-final ogiriCardsProvider = StateProvider<List<OgiriCard>>((ref) => []);
 final nowSelectSortTypeProvider = StateProvider<String>((ref) => sortTypes[0]);
 final selectedDayProvider = StateProvider<DateTime?>((ref) {
   return null;
 });
 bool loadingUserPosts = false;
+final nowShowPostCardIdsProvider = StateProvider<List<String>>((ref) => []);
+final targetPostProvider = StateProvider.family<Post, String>((ref, cardId) {
+  return defaultPost;
+});
 
-void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
+void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked, double width,
+    double height, BuildContext context) {
   final userData = ref.read(userDataProvider);
+  if (post.userId == userData.id) {
+    ToastWidget.showToast('自分の投稿にはいいねできません', width, height, context);
+    return;
+  }
   final goodCardIds = List<String>.from(userData.goodCardIds);
   var targetCardGoodCount = post.goodCount;
   if (userData.id == null) return;
@@ -27,8 +38,10 @@ void pushCardGoodButton(WidgetRef ref, Post post, bool isLiked) {
     goodCardIds.add(post.cardId);
     targetCardGoodCount++;
   }
-  ref.read(targetPostProvider(post.cardId).notifier).state =
-      post.copyWith(goodCount: targetCardGoodCount);
+  final copyOgiriCard = ref.read(targetPostProvider(post.cardId));
+  ref.read(targetPostProvider(post.cardId).notifier).update((state) {
+    return copyOgiriCard.copyWith(goodCount: targetCardGoodCount);
+  });
   UserDataService().saveUserDataToFirebase(ref, 'goodCardIds', goodCardIds);
   FirebaseFunction().changeTargetCardGood(ref, post, isLiked);
 }
@@ -59,8 +72,9 @@ Future<void> sortNowShowPostCardIds(WidgetRef ref, String SortType) async {
   ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostCardIds;
 }
 
-Future<void> setNowShowPostsCardIds(WidgetRef ref, String key) async {
-  // if (ref.read(nowShowPostCardIdsProvider) != []) return;
+Future<void> setNowShowPostsCardIds(
+    WidgetRef ref, String key, bool callFromHome) async {
+  if (callFromHome && ref.read(nowShowPostCardIdsProvider).isNotEmpty) return;
   final userData = ref.read(userDataProvider);
   final blockedUserIds = userData.blockedUserIds;
   final globalDateUsersPostCardIds =
@@ -78,6 +92,15 @@ Future<void> setNowShowPostsCardIds(WidgetRef ref, String key) async {
 
 void changeSelectedDay(WidgetRef ref, DateTime selectedDay) async {
   ref.read(nowSelectSortTypeProvider.state).state = sortTypes[0];
-  await getSpecificDateUsersPosts(ref, selectedDay.toString());
   await sortNowShowPostCardIds(ref, sortTypes[0]);
+}
+
+Future<void> homeSceneInitializeData(
+    BuildContext context, WidgetRef ref) async {
+  checkForegroundNotificationPeriodically(ref, context);
+  await initialize(ref, context);
+  await setThemeToProviderFromFirebase(ref);
+  await FirebaseFunction()
+      .getDateUserPostCardIdsFromFirebase(ref, globalDateString);
+  await setNowShowPostsCardIds(ref, globalDateString, true);
 }

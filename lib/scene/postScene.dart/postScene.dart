@@ -17,7 +17,7 @@ class PostScene extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final userTodayCanPostCount = ref.watch(todayUserCanPostCountProvider);
-    checkForegroundNotificationPeriodically(context);
+    checkForegroundNotificationPeriodically(ref, context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await setCountDownToProvider(ref);
       setTodayUserCanPostCount(ref);

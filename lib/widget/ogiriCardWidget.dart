@@ -4,6 +4,7 @@ import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/otherUserInfoScnene/OtherUserInfoScene.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:ogireal_app/widget/dialog/configureDialogWidget.dart';
@@ -13,8 +14,14 @@ final textControllerStateProvider =
     StateProvider.autoDispose<TextEditingController>(
         (ref) => TextEditingController());
 
+final defaultOgiriCard = OgiriCard(
+  cardWidth: 0,
+  cardId: null,
+  pushCardGoodButtonCallback: null,
+);
+
 class OgiriCard extends ConsumerWidget {
-  final double? cardWidth;
+  double? cardWidth;
   final String? cardId;
   final Function(Post post, bool isLiked)? pushCardGoodButtonCallback;
 
@@ -28,8 +35,11 @@ class OgiriCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool posting = cardId == null;
+    final width = cardWidth ?? 0;
+    final height = width * 0.6;
     Post post =
-        posting ? defaultPost : ref.watch(targetPostProvider(cardId ?? '0'));
+        cardId == null ? defaultPost : ref.watch(targetPostProvider(cardId!));
+
     String answer = post.answer;
     final userData = ref.read(userDataProvider);
     final isLiked = userData.goodCardIds.contains(post.cardId);
@@ -40,11 +50,9 @@ class OgiriCard extends ConsumerWidget {
       answer = '';
       theme = ref.watch(nowThemeProvider);
     }
-    final width = cardWidth ?? 0;
-    final height = width * 0.6;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      textController.text = answer ?? "";
+      textController.text = answer; //postの時に　これが悪さしてる可能性はある
     });
 
     return SizedBox(

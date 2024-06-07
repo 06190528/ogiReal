@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
+import 'package:ogireal_app/common/data/userData/userData.dart';
+import 'package:ogireal_app/common/logic.dart';
+import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/widget/dialog/configureDialogWidget.dart';
+import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 
 double adjustFontSize(
     String text, double width, double height, double minSize) {
@@ -57,4 +62,28 @@ void showHamburgerBottomSheet(BuildContext context, WidgetRef ref) {
       );
     },
   );
+}
+
+Future<void> setTargetUserAllPosts(UserData userData, WidgetRef ref,
+    double width, double height, BuildContext context) async {
+  final userId = ref.read(userDataProvider).id;
+  final List<String> userPostsCardIds = userData.userPostsCardIds;
+  Map<String, List<String>> usersPostCardIdsMap =
+      ref.read(usersPostCardIdsMapProvider); // 現在の状態を読み取る
+
+  if (userId == null) return;
+  if (usersPostCardIdsMap[userId] != null) {
+    if (usersPostCardIdsMap[userId]!.isNotEmpty) return;
+  }
+
+  for (var userPostCardId in userPostsCardIds) {
+    if (ref.read(targetPostProvider(userPostCardId)) != defaultOgiriCard ||
+        await FirebaseFunction().setTargetPostFromFirebase(
+          ref,
+          userPostCardId,
+        )) {
+      //ここれがあるかないかでクラッシュする
+      await setUsersPostCardIdToMapProvider(ref, userPostCardId, userId);
+    }
+  }
 }

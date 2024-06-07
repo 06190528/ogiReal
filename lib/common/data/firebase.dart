@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
@@ -10,6 +11,7 @@ import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
+import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataService {
@@ -115,39 +117,6 @@ Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
   }
 }
 
-//新しいusersPostCardIdsMapProviderを作成し同じでなければ代入して変更を通知
-//firebaseから同じものは取らないようにする.
-Future<void> getSpecificDateUsersPosts(WidgetRef ref, String globalDate) async {
-  try {
-    final List<String>? globalDateUsersPostsCardIdsMap =
-        ref.read(usersPostCardIdsMapProvider)[globalDate];
-    if (globalDateUsersPostsCardIdsMap == null) {
-      loadingUserPosts = true;
-      //まだusersPostCardIdsMapProviderのglobalDateが存在しない時の処理
-      await FirebaseFunction()
-          .getDateUserPostCardIdsFromFirebase(ref, globalDate);
-      final List<String>? globalDateUsersPostsCardIdsMap =
-          ref.read(usersPostCardIdsMapProvider)[globalDate];
-      if (globalDateUsersPostsCardIdsMap != null) {
-        for (var cardId in globalDateUsersPostsCardIdsMap) {
-          await FirebaseFunction()
-              .setTargetPostProviderFromFirebase(ref, cardId);
-        }
-      }
-      loadingUserPosts = false;
-    }
-
-    if (ref.read(usersPostCardIdsMapProvider)[globalDate] == null) {
-      //まだ誰も投稿していない
-      ref.read(usersPostCardIdsMapProvider.state).state[globalDate] = [];
-      print('no usersPosts');
-    }
-    // 日付フィールドを使ってusersPostsコレクションからドキュメントを検索
-  } catch (e) {
-    print('Error fetching user data getTodayUsersPostsAndTheme: $e');
-  }
-}
-
 class FirebaseFunction {
 //user'sPostsのtargetCardIdをのgoodCountを更新
   Future<void> changeTargetCardGood(
@@ -164,19 +133,23 @@ class FirebaseFunction {
   }
 
 //firebaseから大喜利カードを取ってくれる
-  Future<bool> setTargetPostProviderFromFirebase(
-      WidgetRef ref, String cardId) async {
+  Future<bool> setTargetPostFromFirebase(
+    WidgetRef ref,
+    String? cardId,
+  ) async {
+    if (cardId == null) return false;
     if (ref.read(targetPostProvider(cardId)) != defaultPost) {
       return false;
     }
-    ;
     final doc = await FirebaseFirestore.instance
         .collection('usersPosts')
         .doc(cardId)
         .get();
     if (!doc.exists) return false;
     final post = Post.fromJson(doc.data() as Map<String, dynamic>);
-    ref.read(targetPostProvider(cardId).notifier).update((state) => post);
+    ref.read(targetPostProvider(cardId).notifier).update((state) {
+      return post;
+    });
     return true;
   }
 

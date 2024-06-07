@@ -14,7 +14,7 @@ class OtherUserInfoScene extends ConsumerWidget {
   OtherUserInfoScene({required this.userId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    checkForegroundNotificationPeriodically(context);
+    checkForegroundNotificationPeriodically(ref, context);
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final otherUserData = ref.watch(otherUserDataProvider(userId));

@@ -32,6 +32,7 @@ class GlobalData {
   DateTime todayDate;
   DateTime startAt;
   DateTime endAt;
+  String globalDateStringFromFirebase;
 
   factory GlobalData() {
     return _instance;
@@ -40,7 +41,9 @@ class GlobalData {
   GlobalData._internal()
       : todayDate = DateTime.now(),
         startAt = DateTime.now(),
-        endAt = DateTime.now();
+        endAt = DateTime.now(),
+        globalDateStringFromFirebase =
+            DateFormat('yyyyMMdd').format(DateTime.now());
 
   Future<void> initializeTodayDate() async {
     var todayDateDoc = await FirebaseFirestore.instance
@@ -50,22 +53,20 @@ class GlobalData {
 
     if (todayDateDoc.exists) {
       // Firestoreから取得したデータをDateTimeに変換
-      String? todayDateString = todayDateDoc.data()?['todayDate'] as String?;
-      if (todayDateString != null) {
-        print('todayDateString: $todayDateString'); // デバッグ用(日付の確認)
+      globalDateStringFromFirebase =
+          todayDateDoc.data()?['todayDate'] as String;
+      if (globalDateStringFromFirebase != null) {
         try {
           DateTime parsedTodayDate =
-              DateFormat('yyyyMMdd').parse(todayDateString);
+              DateFormat('yyyyMMdd').parse(globalDateStringFromFirebase);
           todayDate = DateTime(
               parsedTodayDate.year, parsedTodayDate.month, parsedTodayDate.day);
         } catch (e) {
           print('Error parsing todayDate: $e');
         }
       }
-
       String? startAtString = todayDateDoc.data()?['start_at'] as String?;
       if (startAtString != null) {
-        print('startAtString: $startAtString'); // デバッグ用(開始時刻の確認)
         try {
           DateTime startAt1 = DateFormat('HH:mm').parse(startAtString);
           DateTime now = DateTime.now();
@@ -78,7 +79,6 @@ class GlobalData {
 
       String? endAtString = todayDateDoc.data()?['end_at'] as String?;
       if (endAtString != null) {
-        print('endAtString: $endAtString'); // デバッグ用(終了時刻の確認)
         try {
           DateTime endAt1 = DateFormat('HH:mm').parse(endAtString);
           DateTime now = DateTime.now();
@@ -95,8 +95,7 @@ class GlobalData {
 }
 
 // globalDateをDateTime型として取得するためのゲッター
-String get globalDateString =>
-    DateFormat('yyyyMMdd').format(GlobalData().todayDate);
+String get globalDateString => GlobalData().globalDateStringFromFirebase;
 DateTime get globalDate => GlobalData().todayDate;
 DateTime get globalStartAt => GlobalData().startAt;
 DateTime get globalEndAt => GlobalData().endAt;

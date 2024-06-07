@@ -10,7 +10,6 @@ class CalendarWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(startDay);
     final _selectedDay = ref.watch(selectedDayProvider);
 
     return Container(

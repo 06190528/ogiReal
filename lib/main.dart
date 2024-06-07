@@ -4,10 +4,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
+import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/firebase_options.dart';
 import 'package:ogireal_app/scene/homeScene/homeScene.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScene.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoScene.dart';
+import 'package:flutter/widgets.dart';
 
 void main() async {
   // debugPaintSizeEnabled = true; // UIのデバッグを有効にする
@@ -16,7 +18,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   MobileAds.instance.initialize();
-  await GlobalData().initializeTodayDate(); // グローバルデータの初期化
+  await GlobalData().initializeTodayDate();
+  Common.screenSize = WidgetsBinding.instance.window.physicalSize /
+      WidgetsBinding.instance.window.devicePixelRatio;
   runApp(
     ProviderScope(
       child: MyApp(),
@@ -32,12 +36,10 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false, // ここを追加
       initialRoute: HomeScene.routeName, // 初期ルートを指定
       routes: {
-        HomeScene.routeName: (context) => HomeScene(), // ホーム画面
-        PostScene.routeName: (context) => PostScene(), // 投稿画面
-        UserInfoScene.routeName: (context) => UserInfoScene(), // ユーザー画面
+        HomeScene.routeName: (context) => const HomeScene(),
+        PostScene.routeName: (context) => PostScene(),
+        UserInfoScene.routeName: (context) => UserInfoScene(),
       },
-      // 'home' プロパティは 'initialRoute' と競合するため、ここではコメントアウトします
-      // home: HomeScene(),
     );
   }
 }

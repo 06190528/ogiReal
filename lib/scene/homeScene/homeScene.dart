@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
-import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
-import 'package:ogireal_app/common/intialize.dart';
-import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/homeScene/widget/carenderWidget.dart';
@@ -12,7 +9,6 @@ import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 import 'package:ogireal_app/widget/rectangleButtonWidget.dart';
-import 'package:ogireal_app/widget/toastWidget.dart';
 
 class HomeScene extends ConsumerWidget {
   static const String routeName = '/home';
@@ -21,18 +17,11 @@ class HomeScene extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    checkForegroundNotificationPeriodically(context);
-    initialize(ref, context);
-    final userData = ref.watch(userDataProvider);
+    bool _wentEdge = false;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final toolBarHeight = height * 0.08;
-    final nowSelectSortType = ref.watch(nowSelectSortTypeProvider);
-    getSpecificDateUsersPosts(ref, globalDateString);
-    setThemeToProviderFromFirebase(ref);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setNowShowPostsCardIds(ref, globalDateString);
-    });
+    homeSceneInitializeData(context, ref);
     final nowShowPostCardIds = ref.watch(nowShowPostCardIdsProvider);
     return Scaffold(
       backgroundColor: themeColor,
@@ -82,9 +71,7 @@ class HomeScene extends ConsumerWidget {
                       width: width * 0.3,
                       height: toolBarHeight * 0.4,
                       onPressed: () {
-                        sortNowShowPostCardIds(ref, sortType);
-                        ref.read(nowSelectSortTypeProvider.state).state =
-                            sortType;
+                        if (_wentEdge) sortNowShowPostCardIds(ref, sortType);
                       },
                       buttonStyle: ButtonStyle(
                         backgroundColor:
@@ -120,26 +107,36 @@ class HomeScene extends ConsumerWidget {
                     ),
                     itemBuilder: (BuildContext context, int index) {
                       String cardId = nowShowPostCardIds[index];
-                      return Container(
-                        color: themeColor,
-                        width: cardWidth,
-                        margin: EdgeInsets.only(
-                            left: width * 0.01, right: width * 0.01),
-                        child: OgiriCard(
-                          cardWidth: cardWidth,
-                          cardId: cardId,
-                          pushCardGoodButtonCallback: (
-                            post,
-                            isLiked,
-                          ) {
-                            if (post.userId == userData.id) {
-                              ToastWidget.showToast(
-                                  '自分の投稿にはいいねできません', width, height, context);
-                              return;
-                            }
-                            pushCardGoodButton(ref, post, isLiked);
-                          },
-                        ),
+                      if (index == nowShowPostCardIds.length - 1)
+                        _wentEdge = true;
+                      return FutureBuilder(
+                        future: FirebaseFunction()
+                            .setTargetPostFromFirebase(ref, cardId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return OgiriCard(
+                              cardWidth: cardWidth,
+                              cardId: cardId,
+                              pushCardGoodButtonCallback: (post, isLiked) {
+                                if (post.userId ==
+                                    ref.read(userDataProvider).id) {
+                                  return;
+                                }
+                                pushCardGoodButton(
+                                    ref, post, isLiked, width, height, context);
+                              },
+                            );
+                          } else {
+                            return Container(
+                              width: cardWidth,
+                              height: cardWidth * 0.6,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                        },
                       );
                     },
                   );

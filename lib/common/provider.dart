@@ -1,9 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
-import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
+import 'package:flutter/widgets.dart';
+
+class Common {
+  static bool comeForegroundNotification = false;
+
+  static Size screenSize = const Size(0, 0);
+}
 
 const defaultUserData = UserData(
   id: null,
@@ -28,20 +32,10 @@ final usersPostCardIdsMapProvider =
   return {};
 }); //これはfirebaseから取得した全てのPostのcardIdのみを格納する
 
-final targetPostProvider = StateProvider.family<Post, String>((ref, carId) {
-  return defaultPost;
-}); //usersPostsMapProviderを使ってPostを取得する
-
 final otherUserDataProvider =
     StateProvider.family<UserData, String>((ref, userId) {
   return defaultUserData;
 });
 
-final nowShowPostCardIdsProvider = StateProvider<List<String>>((ref) {
-  return [];
-});
-
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-
-bool comeForegroundNotification = false;
