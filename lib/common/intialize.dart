@@ -63,7 +63,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> initializeMessaging() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   final String? fcmToken = await FirebaseMessaging.instance.getToken();
-  print('FCM Token: $fcmToken');
+  // print('FCM Token: $fcmToken');
 
   // プラットフォームがAndroidかつWebではない場合、Google Play Servicesのチェック
   if (!kIsWeb && io.Platform.isAndroid) {

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
+import 'package:ogireal_app/common/data/firebase.dart';
+import 'package:ogireal_app/common/logic.dart';
+import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWidget extends ConsumerWidget {
   final DateTime startDay = DateTime.utc(2024, 5, 23);
-  final DateTime endDay = globalDate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _selectedDay = ref.watch(selectedDayProvider);
+    final _selectedDay = ref.watch(selectedDateProvider);
 
     return Container(
       padding: EdgeInsets.all(10.0),
@@ -21,21 +23,26 @@ class CalendarWidget extends ConsumerWidget {
         ),
         child: TableCalendar(
           firstDay: startDay,
-          lastDay: endDay,
-          focusedDay: startDay,
+          lastDay: globalDate,
+          focusedDay: _selectedDay,
           calendarFormat: CalendarFormat.month,
           selectedDayPredicate: (day) {
-            changeSelectedDay(ref, day);
             return isSameDay(_selectedDay, day);
           },
-          onDaySelected: (selectedDay, focusedDay) {
+          onDaySelected: (selectedDay, focusedDay) async {
             if (!isSameDay(_selectedDay, selectedDay)) {
-              ref.read(selectedDayProvider.notifier).state = selectedDay;
+              ref.read(selectedDateProvider.notifier).state = selectedDay;
+              String _selectedDayString = getSelectedDateString(ref);
+              await FirebaseFunction()
+                  .getDateUserPostCardIdsFromFirebase(ref, _selectedDayString);
+              await setNowShowPostsCardIds(ref, _selectedDayString, false);
+              await fetchThemeToProviderFromFirebase(ref, _selectedDayString);
+              Navigator.of(context).pop();
             }
           },
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, day, focusedDay) {
-              if (day.isBefore(startDay) || day.isAfter(endDay)) {
+              if (day.isBefore(startDay) || day.isAfter(globalDate)) {
                 return Center(
                   child: Text(
                     day.day.toString(),
@@ -67,6 +74,23 @@ class CalendarWidget extends ConsumerWidget {
                   ),
                 ),
               );
+            },
+            todayBuilder: (context, day, focusedDay) {
+              if (day.isBefore(startDay) || day.isAfter(globalDate)) {
+                return Center(
+                  child: Text(
+                    day.day.toString(),
+                    style: TextStyle(color: Colors.black), // 黒色
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    day.day.toString(),
+                    style: TextStyle(color: Colors.grey[400]), // 薄めのグレー
+                  ),
+                );
+              }
             },
           ),
         ),

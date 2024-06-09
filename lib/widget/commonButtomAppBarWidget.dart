@@ -15,7 +15,7 @@ class CommonBottomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentRouteName = ModalRoute.of(context)?.settings.name;
-    double iconSize = height * 0.03;
+    double iconSize = height * 0.08;
     return BottomAppBar(
       color: themeColor,
       height: height * 0.1,

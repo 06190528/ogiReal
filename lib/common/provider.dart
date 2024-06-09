@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:flutter/widgets.dart';
 
@@ -23,10 +24,6 @@ final userDataProvider = StateProvider<UserData>((ref) {
   return defaultUserData;
 });
 
-final nowThemeProvider = StateProvider<String>((ref) {
-  return 'default';
-});
-
 final usersPostCardIdsMapProvider =
     StateProvider<Map<String, List<String>>>((ref) {
   return {};
@@ -39,3 +36,7 @@ final otherUserDataProvider =
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+final selectedDateProvider = StateProvider<DateTime>((ref) {
+  return globalDate;
+});

@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
@@ -11,7 +9,6 @@ import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
-import 'package:ogireal_app/widget/ogiriCardWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataService {
@@ -101,24 +98,21 @@ class UserDataService {
   }
 }
 
-Future<void> setThemeToProviderFromFirebase(WidgetRef ref) async {
-  if (ref.read(nowThemeProvider) == 'default') {
-    DocumentSnapshot themeDocRef = await FirebaseFirestore.instance
-        .collection('theme')
-        .doc(globalDateString)
-        .get();
-    if (themeDocRef.exists && themeDocRef.data() != null) {
-      Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
-      String theme = data['theme'] as String? ?? 'デフォルトテーマ';
-      ref.read(nowThemeProvider.notifier).state = theme;
-    } else {
-      print('Date data or theme data is not available.');
-    }
+Future<void> fetchThemeToProviderFromFirebase(
+    WidgetRef ref, String date) async {
+  if (ref.read(themesProvider(date)) != 'default') return;
+  DocumentSnapshot themeDocRef =
+      await FirebaseFirestore.instance.collection('theme').doc(date).get();
+  if (themeDocRef.exists && themeDocRef.data() != null) {
+    Map<String, dynamic> data = themeDocRef.data() as Map<String, dynamic>;
+    String theme = data['theme'] as String? ?? 'デフォルトテーマ';
+    ref.read(themesProvider(date).notifier).state = theme;
+  } else {
+    print('Date data or theme data is not available.');
   }
 }
 
 class FirebaseFunction {
-//user'sPostsのtargetCardIdをのgoodCountを更新
   Future<void> changeTargetCardGood(
       WidgetRef ref, Post targetUserPost, bool isLiked) async {
     String targetCardId = targetUserPost.cardId;
@@ -173,7 +167,6 @@ class FirebaseFunction {
       String date, String cardId) async {
     final docRef =
         FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
-
     // Firestore ドキュメントに cardId を追加
     await docRef.update({
       'cardIds': FieldValue.arrayUnion([cardId])
@@ -186,6 +179,7 @@ class FirebaseFunction {
 
   Future<void> getDateUserPostCardIdsFromFirebase(
       WidgetRef ref, String date) async {
+    if (ref.read(usersPostCardIdsMapProvider)[date] != null) return;
     final docRef =
         FirebaseFirestore.instance.collection('dateUserPostCardIds').doc(date);
     final doc = await docRef.get();

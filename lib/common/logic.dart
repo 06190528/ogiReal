@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/provider.dart';
@@ -18,15 +19,10 @@ void navigateAndRemoveUntil(
 bool canGoNextScene(WidgetRef ref) {
   bool canGo = false;
   final userData = ref.read(userDataProvider);
-  final theme = ref.read(nowThemeProvider);
-  if (userData != defaultUserData &&
-      theme != 'default' &&
-      loadingUserPosts == false) {
-    //usersPosts設定されているkeyのvalueがあるかどうか確認しないとあかん
+  if (userData != defaultUserData && loadingUserPosts == false) {
     canGo = true;
   }
   // print('userData: $userData');
-  // print('theme: $theme');
   // print('loadingUserPosts: $loadingUserPosts');
   // print('canGo: $canGo');
   return canGo;
@@ -50,13 +46,18 @@ Future<void> checkForegroundNotificationPeriodically(
   Timer.periodic(Duration(seconds: 1), (timer) async {
     if (Common.comeForegroundNotification) {
       Navigator.of(context).pushNamed('/post');
-      ref.read(nowThemeProvider.state).state = 'default';
       await GlobalData().initializeTodayDate(); // グローバルデータの初期化
-      await setThemeToProviderFromFirebase(ref);
+      ref.read(selectedDateProvider.state).state = globalDate;
       await FirebaseFunction()
           .getDateUserPostCardIdsFromFirebase(ref, globalDateString);
       await setNowShowPostsCardIds(ref, globalDateString, false);
       Common.comeForegroundNotification = false; // 遷移後にフラグをリセット
     }
   });
+}
+
+String getSelectedDateString(WidgetRef ref) {
+  final DateTime selectedDate = ref.read(selectedDateProvider);
+  final String selectedDateString = DateFormat('yyyyMMdd').format(selectedDate);
+  return selectedDateString;
 }

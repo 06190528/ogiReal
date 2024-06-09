@@ -13,7 +13,8 @@ class CountDownAppBarWidget extends ConsumerWidget {
     final minutes = ((secondsLeft % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (secondsLeft % 60).toString().padLeft(2, '0');
     final height = MediaQuery.of(context).size.height;
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           '新規投稿',
@@ -22,14 +23,16 @@ class CountDownAppBarWidget extends ConsumerWidget {
             fontSize: height * 0.03,
           ),
         ),
-        if (secondsLeft > 0)
+        if (secondsLeft > 0) ...[
+          const SizedBox(width: 10),
           Text(
-            '残り時間 $hours:$minutes:$seconds',
+            '$hours:$minutes:$seconds',
             style: TextStyle(
               color: themeTextColor,
               fontSize: height * 0.02,
             ),
           ),
+        ],
       ],
     );
   }

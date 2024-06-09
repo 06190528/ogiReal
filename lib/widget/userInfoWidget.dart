@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
+import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/userData/userData.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
@@ -57,26 +58,67 @@ class UserInfoWidget extends ConsumerWidget {
         ),
         SizedBox(height: height * 0.02),
         Expanded(
-          child: ListView.builder(
-            itemCount: usersPostCardIds.length,
-            itemBuilder: (context, index) {
-              return Container(
-                  margin: EdgeInsets.only(
-                      bottom: height * 0.01,
-                      left: width * 0.05,
-                      right: width * 0.05),
-                  child: OgiriCard(
-                    cardWidth: width * 0.9,
-                    cardId: usersPostCardIds[index],
-                    pushCardGoodButtonCallback: (post, isLiked) {
-                      if (post.userId == ref.read(userDataProvider).id) {
-                        return;
-                      }
-                      pushCardGoodButton(
-                          ref, post, isLiked, width, height, context);
+          child: Center(
+            child: usersPostCardIds.isNotEmpty
+                ? LayoutBuilder(
+                    builder: (context, constraints) {
+                      int crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+                      double cardWidth = (width * 0.8) / crossAxisCount;
+                      return GridView.builder(
+                        itemCount: usersPostCardIds.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: 2,
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          String cardId = usersPostCardIds[index];
+                          if (index == usersPostCardIds.length - 1) {
+                            return FutureBuilder(
+                              future: FirebaseFunction()
+                                  .setTargetPostFromFirebase(ref, cardId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return OgiriCard(
+                                    cardWidth: cardWidth,
+                                    cardId: cardId,
+                                    pushCardGoodButtonCallback:
+                                        (post, isLiked) {
+                                      if (post.userId ==
+                                          ref.read(userDataProvider).id) {
+                                        return;
+                                      }
+                                      pushCardGoodButton(ref, post, isLiked,
+                                          width, height, context);
+                                    },
+                                  );
+                                } else {
+                                  return Container(
+                                    width: cardWidth,
+                                    height: cardWidth * 0.6,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
+                          }
+                        },
+                      );
                     },
-                  ));
-            },
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      '投稿はまだありません。',
+                      style: TextStyle(
+                        fontSize: height * 0.03,
+                        color: themeTextColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
           ),
         ),
       ],

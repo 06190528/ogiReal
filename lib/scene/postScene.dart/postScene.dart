@@ -88,7 +88,7 @@ class PostScene extends ConsumerWidget {
         ),
         bottomNavigationBar: CommonBottomAppBar(
           ref: ref,
-          height: height * 0.8,
+          height: height * 0.4,
         ),
       ),
     );

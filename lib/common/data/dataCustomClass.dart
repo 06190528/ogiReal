@@ -54,17 +54,21 @@ class GlobalData {
     if (todayDateDoc.exists) {
       // Firestoreから取得したデータをDateTimeに変換
       globalDateStringFromFirebase =
-          todayDateDoc.data()?['todayDate'] as String;
+          (todayDateDoc.data()?['todayDate'] as String).trim();
       if (globalDateStringFromFirebase != null) {
         try {
+          String year = globalDateStringFromFirebase.substring(0, 4);
+          String month = globalDateStringFromFirebase.substring(4, 6);
+          String day = globalDateStringFromFirebase.substring(6, 8);
+
           DateTime parsedTodayDate =
-              DateFormat('yyyyMMdd').parse(globalDateStringFromFirebase);
-          todayDate = DateTime(
-              parsedTodayDate.year, parsedTodayDate.month, parsedTodayDate.day);
+              DateTime.parse('$year-$month-$day 00:00:00');
+          todayDate = parsedTodayDate;
         } catch (e) {
           print('Error parsing todayDate: $e');
         }
       }
+
       String? startAtString = todayDateDoc.data()?['start_at'] as String?;
       if (startAtString != null) {
         try {

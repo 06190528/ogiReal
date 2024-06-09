@@ -58,7 +58,7 @@ class OtherUserInfoScene extends ConsumerWidget {
       ),
       bottomNavigationBar: CommonBottomAppBar(
         ref: ref,
-        height: height,
+        height: height * 0.4,
       ),
     );
   }

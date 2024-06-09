@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
+import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
 import 'package:ogireal_app/scene/otherUserInfoScnene/OtherUserInfoScene.dart';
@@ -48,12 +49,9 @@ class OgiriCard extends ConsumerWidget {
     final textController = ref.watch(textControllerStateProvider);
     if (posting) {
       answer = '';
-      theme = ref.watch(nowThemeProvider);
+      String _selectedDateString = getSelectedDateString(ref);
+      theme = ref.watch(themesProvider(_selectedDateString));
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      textController.text = answer; //postの時に　これが悪さしてる可能性はある
-    });
 
     return SizedBox(
       width: width,

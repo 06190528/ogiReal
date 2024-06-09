@@ -28,7 +28,7 @@ class UserInfoScene extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.menu, color: themeTextColor),
+            icon: Icon(Icons.menu, color: themeTextColor, size: height * 0.04),
             onPressed: () {
               showHamburgerBottomSheet(context, ref);
             },
@@ -42,7 +42,7 @@ class UserInfoScene extends ConsumerWidget {
       ),
       bottomNavigationBar: CommonBottomAppBar(
         ref: ref,
-        height: height * 0.8,
+        height: height * 0.4,
       ),
     );
   }

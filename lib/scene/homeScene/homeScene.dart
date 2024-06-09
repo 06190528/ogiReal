@@ -4,7 +4,6 @@ import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/homeSceneProvider.dart';
-import 'package:ogireal_app/scene/homeScene/widget/carenderWidget.dart';
 import 'package:ogireal_app/scene/userInfoScene/userInfoSceneProvider.dart';
 import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/ogiriCardWidget.dart';
@@ -50,13 +49,7 @@ class HomeScene extends ConsumerWidget {
                     size: toolBarHeight * 0.3,
                   ),
                   onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) {
-                        return CalendarWidget();
-                      },
-                    );
+                    showCalendarDialog(context);
                   },
                 ),
               ],
@@ -156,7 +149,7 @@ class HomeScene extends ConsumerWidget {
       ),
       bottomNavigationBar: CommonBottomAppBar(
         ref: ref,
-        height: height * 0.8,
+        height: height * 0.4,
       ),
     );
   }

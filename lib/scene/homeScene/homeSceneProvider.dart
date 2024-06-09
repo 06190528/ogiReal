@@ -7,14 +7,14 @@ import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/intialize.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/homeScene/widget/carenderWidget.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
 import 'package:ogireal_app/widget/toastWidget.dart';
 
 final nowSelectSortTypeProvider = StateProvider<String>((ref) => sortTypes[0]);
-final selectedDayProvider = StateProvider<DateTime?>((ref) {
-  return null;
-});
+
 bool loadingUserPosts = false;
+
 final nowShowPostCardIdsProvider = StateProvider<List<String>>((ref) => []);
 final targetPostProvider = StateProvider.family<Post, String>((ref, cardId) {
   return defaultPost;
@@ -90,17 +90,24 @@ Future<void> setNowShowPostsCardIds(
   ref.read(nowShowPostCardIdsProvider.state).state = nowShowPostsCardIds;
 }
 
-void changeSelectedDay(WidgetRef ref, DateTime selectedDay) async {
-  ref.read(nowSelectSortTypeProvider.state).state = sortTypes[0];
-  await sortNowShowPostCardIds(ref, sortTypes[0]);
-}
+void changeSelectedDay(WidgetRef ref, DateTime selectedDay) async {}
 
 Future<void> homeSceneInitializeData(
     BuildContext context, WidgetRef ref) async {
   checkForegroundNotificationPeriodically(ref, context);
   await initialize(ref, context);
-  await setThemeToProviderFromFirebase(ref);
+  await fetchThemeToProviderFromFirebase(ref, globalDateString);
   await FirebaseFunction()
       .getDateUserPostCardIdsFromFirebase(ref, globalDateString);
   await setNowShowPostsCardIds(ref, globalDateString, true);
+}
+
+void showCalendarDialog(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return CalendarWidget();
+    },
+  );
 }
