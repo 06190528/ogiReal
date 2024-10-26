@@ -12,16 +12,17 @@ class CommonBottomAppBar extends StatelessWidget {
 
   const CommonBottomAppBar(
       {super.key, required this.ref, required this.height});
+
   @override
   Widget build(BuildContext context) {
     final currentRouteName = ModalRoute.of(context)?.settings.name;
-    double iconSize = height * 0.08;
+    final bottomAppBarHeight = height * 0.05; // ここで高さを調整
+    double iconSize = bottomAppBarHeight * 0.8; // アイコンのサイズを調整
+    double buttonSize = bottomAppBarHeight; // ボタンのサイズを調整
     return BottomAppBar(
       color: themeColor,
-      height: height * 0.1,
-      child: Container(
-        height: height * 0.1,
-        color: themeColor,
+      child: SizedBox(
+        height: bottomAppBarHeight, // BottomAppBarの高さを設定
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -37,6 +38,11 @@ class CommonBottomAppBar extends StatelessWidget {
                           context, HomeScene.routeName, ref);
                     }
                   : null,
+              iconSize: iconSize,
+              constraints: BoxConstraints(
+                minWidth: buttonSize,
+                minHeight: buttonSize,
+              ),
             ),
             IconButton(
               icon: Icon(Icons.add_box, color: themeTextColor, size: iconSize),
@@ -46,6 +52,11 @@ class CommonBottomAppBar extends StatelessWidget {
                           context, PostScene.routeName, ref);
                     }
                   : null,
+              iconSize: iconSize,
+              constraints: BoxConstraints(
+                minWidth: buttonSize,
+                minHeight: buttonSize,
+              ),
             ),
             IconButton(
               icon: Icon(Icons.person, color: themeTextColor, size: iconSize),
@@ -55,6 +66,11 @@ class CommonBottomAppBar extends StatelessWidget {
                           context, UserInfoScene.routeName, ref);
                     }
                   : null,
+              iconSize: iconSize,
+              constraints: BoxConstraints(
+                minWidth: buttonSize,
+                minHeight: buttonSize,
+              ),
             ),
           ],
         ),

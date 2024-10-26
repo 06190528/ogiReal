@@ -117,7 +117,7 @@ class OgiriCard extends ConsumerWidget {
               ),
               child: Container(
                 width: width * 0.7,
-                height: height * 0.5,
+                height: height * 0.45,
                 padding: EdgeInsets.all(height * 0.01),
                 alignment: Alignment.center, // 子ウィジェットを中央に揃える
                 child: posting

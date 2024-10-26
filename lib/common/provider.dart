@@ -10,6 +10,10 @@ class Common {
   static Size screenSize = const Size(0, 0);
 }
 
+final adLoadingProvider = StateProvider<bool>((ref) {
+  return false;
+});
+
 const defaultUserData = UserData(
   id: null,
   name: null,

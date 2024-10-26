@@ -134,7 +134,6 @@ Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
   final UserData userData = ref.read(userDataProvider);
   final List<String> userPostCardIds = userData.userPostsCardIds;
   String selectedDayString = getSelectedDateString(ref);
-
   bool didPostInLimit = false;
   int todayUserPostedCount = 0;
 
@@ -156,11 +155,18 @@ Future<void> setTodayUserCanPostCount(WidgetRef ref) async {
     }
   });
 
-  if (!didPostInLimit) {
-    ref.read(todayUserCanPostCountProvider.state).state =
-        1 - todayUserPostedCount;
+  int todayUserCanPostCount = 0;
+  if (selectedDayString == globalDateString) {
+    if (!didPostInLimit) {
+      todayUserCanPostCount = 1 - todayUserPostedCount;
+    } else {
+      todayUserCanPostCount = 3 - todayUserPostedCount;
+    }
   } else {
-    ref.read(todayUserCanPostCountProvider.state).state =
-        3 - todayUserPostedCount;
+    todayUserCanPostCount = 1 - todayUserPostedCount;
   }
+  if (todayUserCanPostCount < 0) {
+    todayUserCanPostCount = 0;
+  }
+  ref.read(todayUserCanPostCountProvider.state).state = todayUserCanPostCount;
 }

@@ -5,7 +5,6 @@ import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/data/post/post.dart';
 import 'package:ogireal_app/common/intialize.dart';
-import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
 import 'package:ogireal_app/scene/homeScene/widget/carenderWidget.dart';
 import 'package:ogireal_app/scene/postScene.dart/postScneneProvider.dart';
@@ -94,7 +93,6 @@ void changeSelectedDay(WidgetRef ref, DateTime selectedDay) async {}
 
 Future<void> homeSceneInitializeData(
     BuildContext context, WidgetRef ref) async {
-  checkForegroundNotificationPeriodically(ref, context);
   await initialize(ref, context);
   await fetchThemeToProviderFromFirebase(ref, globalDateString);
   await FirebaseFunction()

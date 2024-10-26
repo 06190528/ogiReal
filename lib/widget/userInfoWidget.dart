@@ -13,8 +13,11 @@ class UserInfoWidget extends ConsumerWidget {
   final double height;
   final UserData userData;
 
-  UserInfoWidget(
-      {required this.width, required this.height, required this.userData});
+  const UserInfoWidget(
+      {super.key,
+      required this.width,
+      required this.height,
+      required this.userData});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userName = userData.name ?? 'Anonymous';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ogireal_app/common/ad/adwidget/interstitialAdWidget.dart';
 import 'package:ogireal_app/common/data/dataCustomClass.dart';
 import 'package:ogireal_app/common/data/firebase.dart';
 import 'package:ogireal_app/common/logic.dart';
@@ -13,7 +14,6 @@ class CalendarWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _selectedDay = ref.watch(selectedDateProvider);
-
     return Container(
       padding: EdgeInsets.all(10.0),
       color: Colors.white, // カレンダー背景を白色に設定
@@ -30,7 +30,11 @@ class CalendarWidget extends ConsumerWidget {
             return isSameDay(_selectedDay, day);
           },
           onDaySelected: (selectedDay, focusedDay) async {
+            if (ref.read(adLoadingProvider)) return;
             if (!isSameDay(_selectedDay, selectedDay)) {
+              ref.read(adLoadingProvider.notifier).state = true;
+              await AdInterstitial().createAd();
+              ref.read(adLoadingProvider.notifier).state = false;
               ref.read(selectedDateProvider.notifier).state = selectedDay;
               String _selectedDayString = getSelectedDateString(ref);
               await FirebaseFunction()

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ogireal_app/common/const.dart';
 import 'package:ogireal_app/common/logic.dart';
 import 'package:ogireal_app/common/provider.dart';
+import 'package:ogireal_app/scene/abstractScene.dart';
 import 'package:ogireal_app/scene/otherUserInfoScnene/OtherUserInfoSceneProvider.dart';
-import 'package:ogireal_app/widget/commonButtomAppBarWidget.dart';
 import 'package:ogireal_app/widget/userInfoWidget.dart';
 
 class OtherUserInfoScene extends ConsumerWidget {
@@ -18,8 +18,7 @@ class OtherUserInfoScene extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final otherUserData = ref.watch(otherUserDataProvider(userId));
-    return Scaffold(
-      backgroundColor: themeColor,
+    return AbstractScene(
       appBar: AppBar(
         backgroundColor: themeColor,
         title: Text(
@@ -55,10 +54,6 @@ class OtherUserInfoScene extends ConsumerWidget {
         width: width,
         height: height,
         userData: otherUserData,
-      ),
-      bottomNavigationBar: CommonBottomAppBar(
-        ref: ref,
-        height: height * 0.4,
       ),
     );
   }
